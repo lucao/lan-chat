@@ -1,5 +1,6 @@
 package br.com.lucasvmteixeira.chat.net;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,10 +12,10 @@ import br.com.lucasvmteixeira.chat.entity.Mensagem;
 public class Mensagens {
 	private Set<Mensagem> mensagens;
 
-	public Mensagens(Set<Mensagem> mensagens) {
+	public Mensagens() {
 		super();
 		//TODO read from file;
-		this.mensagens = mensagens;
+		this.mensagens = new HashSet<Mensagem>();
 	}
 
 	public List<Mensagem> doGrupo(GrupoPrivado grupo) {
@@ -23,5 +24,9 @@ public class Mensagens {
 
 	public Map<GrupoPrivado, List<Mensagem>> porGrupo() {
 		return mensagens.stream().collect(Collectors.groupingBy(Mensagem::getGrupo));
+	}
+	
+	public void add(Mensagem mensagem) {
+		mensagens.add(mensagem);
 	}
 }

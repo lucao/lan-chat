@@ -13,24 +13,33 @@ import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
 
+import br.com.lucasvmteixeira.chat.entity.Mensagem;
 import br.com.lucasvmteixeira.chat.entity.Usuario;
 
+//TODO externalizar controle de usuários
 public class Gerenciador {
 	private final JChannel canalPrincipal;
 	private View lastView;
 
 	private final Map<Address, Usuario> usuarios;
 	private final Set<Address> usuariosSemIdentificacao;
+	
+	private final Mensagens mensagens;
 
 	public Gerenciador() throws Exception {
 		this.usuarios = new HashMap<Address, Usuario>();
 		this.usuariosSemIdentificacao = new HashSet<Address>();
+		this.mensagens = new Mensagens();
 		try {
 			this.canalPrincipal = new JChannel("src/main/resources/udp.xml");
 			this.canalPrincipal.setReceiver(new ReceiverAdapter() {
 				public void receive(Message msg) {
-					System.out.println("received message " + msg);
+					Address sender = msg.getSrc();
+					Mensagem mensagem = (Mensagem) msg.getObject();
 					//TODO
+					synchronized(mensagens) {
+						mensagens.add(mensagem);
+					}
 				}
 
 				public void viewAccepted(View view) {
