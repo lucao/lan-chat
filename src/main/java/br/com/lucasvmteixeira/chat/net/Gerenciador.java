@@ -15,14 +15,14 @@ import org.jgroups.View;
 
 import br.com.lucasvmteixeira.chat.entity.Usuario;
 
-public class GerenciadorDeRede {
+public class Gerenciador {
 	private final JChannel canalPrincipal;
 	private View lastView;
 
 	private final Map<Address, Usuario> usuarios;
 	private final Set<Address> usuariosSemIdentificacao;
 
-	public GerenciadorDeRede() throws Exception {
+	public Gerenciador() throws Exception {
 		this.usuarios = new HashMap<Address, Usuario>();
 		this.usuariosSemIdentificacao = new HashSet<Address>();
 		try {
