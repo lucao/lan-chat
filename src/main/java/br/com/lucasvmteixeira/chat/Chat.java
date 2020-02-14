@@ -37,19 +37,17 @@ public class Chat {
 			painelDeUsuarios.setVisible(false);
 			painelDeChat.setVisible(true);
 			
-			
 			glassPanel.repaint();
 		});
-		
 		
 		frame.getContentPane().add(glassPanel);
 		frame.pack();
 		frame.setSize(400, 400);
 		frame.setLocationRelativeTo(null);
-		
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) {
 				//TODO
+				
 			}
 		});
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
