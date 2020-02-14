@@ -6,6 +6,8 @@ public class Usuario {
 	private String nome;
 	private Collection<GrupoPrivado> gruposPrivados;
 	
+	private String canalConectado;
+	
 	public String getNome() {
 		return nome;
 	}
@@ -17,5 +19,11 @@ public class Usuario {
 	}
 	public void setGruposPrivados(Collection<GrupoPrivado> gruposPrivados) {
 		this.gruposPrivados = gruposPrivados;
+	}
+	public String getCanalConectado() {
+		return canalConectado;
+	}
+	public void setCanalConectado(String canalConectado) {
+		this.canalConectado = canalConectado;
 	}
 }

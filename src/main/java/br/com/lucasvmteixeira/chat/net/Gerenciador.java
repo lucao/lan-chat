@@ -16,7 +16,6 @@ import org.jgroups.View;
 import br.com.lucasvmteixeira.chat.entity.Mensagem;
 import br.com.lucasvmteixeira.chat.entity.Usuario;
 
-//TODO externalizar controle de usuários
 public class Gerenciador {
 	private final JChannel canalPrincipal;
 	private View lastView;
@@ -36,7 +35,16 @@ public class Gerenciador {
 				public void receive(Message msg) {
 					Address sender = msg.getSrc();
 					Mensagem mensagem = (Mensagem) msg.getObject();
-					//TODO
+					synchronized (usuariosSemIdentificacao) {
+						if (usuariosSemIdentificacao.contains(sender)) {
+							usuariosSemIdentificacao.remove(sender);
+							synchronized(usuarios) {
+								if (!usuarios.containsKey(sender)) {
+									usuarios.put(sender, mensagem.getSender());
+								}
+							}
+						}
+					}
 					synchronized(mensagens) {
 						mensagens.add(mensagem);
 					}
@@ -70,7 +78,7 @@ public class Gerenciador {
 	 */
 	public ChannelWrapper conectar(Usuario usuario) throws Exception {
 		canalPrincipal.name(usuario.getNome());
-		canalPrincipal.connect("chatPrincipal");
+		canalPrincipal.connect(usuario.getCanalConectado());
 		return new ChannelWrapper(canalPrincipal);
 	}
 

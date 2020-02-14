@@ -32,6 +32,15 @@ public class Chat {
 			glassPanel.repaint();
 		});
 		
+		Interface.btnIniciarChat.addActionListener((evt) -> {
+			painelDeAbertura.setVisible(false);
+			painelDeUsuarios.setVisible(false);
+			painelDeChat.setVisible(true);
+			
+			
+			glassPanel.repaint();
+		});
+		
 		
 		frame.getContentPane().add(glassPanel);
 		frame.pack();
