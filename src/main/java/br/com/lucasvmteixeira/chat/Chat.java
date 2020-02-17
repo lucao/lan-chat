@@ -4,9 +4,16 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.jgroups.JChannel;
+
+import br.com.lucasvmteixeira.chat.entity.Usuario;
+import br.com.lucasvmteixeira.chat.net.ChannelWrapper;
+
 public class Chat {
+	private static ChannelWrapper canalPrincipal = new ChannelWrapper();
 
 	public static void main(String[] args) {
 		JFrame frame = new JFrame();
@@ -22,14 +29,39 @@ public class Chat {
 		final JPanel glassPanel = new JPanel();
 		glassPanel.add(painelDeAbertura);
 		glassPanel.add(painelDeUsuarios);
-		glassPanel.add(painelDeChat);				
+		glassPanel.add(painelDeChat);
 		
 		Interface.btnConectar.addActionListener((evt) -> {
-			painelDeAbertura.setVisible(false);
-			painelDeChat.setVisible(false);
-			painelDeUsuarios.setVisible(true);
-			
-			glassPanel.repaint();
+			try {
+				String nomeDoUsuario = Interface.nickname.getText();
+				
+				if (nomeDoUsuario == null) {
+					throw new NomeDeUsuarioInvalido();
+				}
+				if (nomeDoUsuario.length() == 0) {
+					throw new NomeDeUsuarioInvalido();
+				}
+				
+				Usuario usuario = new Usuario();
+				usuario.setNome(nomeDoUsuario);
+				synchronized (canalPrincipal) {
+					try {
+						canalPrincipal.connect(new JChannel("src/main/resources/udp.xml"));
+					} catch (Exception e) {
+						throw new ErroDeConexao();
+					}
+				}
+				
+				painelDeAbertura.setVisible(false);
+				painelDeUsuarios.setVisible(false);
+				painelDeChat.setVisible(true);			
+				
+				glassPanel.repaint();
+			} catch (NomeDeUsuarioInvalido e) {
+				JOptionPane.showMessageDialog(null, "Nome inválido");
+			} catch (ErroDeConexao e) {
+				JOptionPane.showMessageDialog(null, "Erro ao tentar conectar");
+			}
 		});
 		
 		Interface.btnIniciarChat.addActionListener((evt) -> {
@@ -42,18 +74,14 @@ public class Chat {
 		
 		frame.getContentPane().add(glassPanel);
 		frame.pack();
-		frame.setSize(400, 400);
+		frame.setSize(600, 600);
 		frame.setLocationRelativeTo(null);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) {
 				//TODO
-				
 			}
 		});
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 	}
-
-	
-
 }

@@ -1,13 +1,21 @@
 package br.com.lucasvmteixeira.chat.entity;
 
 import java.util.Collection;
+import java.util.List;
 
 public class Usuario {
+	private static final String canalPrincipal = "channel";
+	
 	private String nome;
 	private Collection<GrupoPrivado> gruposPrivados;
+	private List<Mensagem> conversas;
 	
 	private String canalConectado;
 	
+	public Usuario() {
+		super();
+		canalConectado = canalPrincipal;
+	}
 	public String getNome() {
 		return nome;
 	}
@@ -25,5 +33,11 @@ public class Usuario {
 	}
 	public void setCanalConectado(String canalConectado) {
 		this.canalConectado = canalConectado;
+	}
+	public List<Mensagem> getConversas() {
+		return conversas;
+	}
+	public void setConversas(List<Mensagem> conversas) {
+		this.conversas = conversas;
 	}
 }

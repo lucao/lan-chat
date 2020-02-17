@@ -9,7 +9,7 @@ import org.jgroups.Message;
 public class ChannelWrapper {
 	private JChannel channel;
 
-	public ChannelWrapper(JChannel channel) {
+	public void connect(JChannel channel) {
 		this.channel = channel;
 	}
 

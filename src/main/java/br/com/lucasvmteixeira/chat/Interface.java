@@ -1,18 +1,27 @@
 package br.com.lucasvmteixeira.chat;
 
 import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class Interface {
 	public static final JButton btnEnviar = new JButton();
+	public static final JMenuItem btnEnviarImg = new JMenuItem();
+	public static final JMenuItem btnEnviarVid = new JMenuItem();
+	public static final JMenuItem btnEnviarFile = new JMenuItem();
+	public static final JMenuItem btnEnviarPrivate = new JMenuItem();
+
 	public static final JTextField entrada = new JTextField();
 
 	public static final JTextField nickname = new JTextField();
@@ -30,6 +39,23 @@ public class Interface {
 
 		btnEnviar.setText("Enviar");
 
+		btnEnviarPrivate.setText("Conversa");
+		btnEnviarImg.setText("Imagem");
+		btnEnviarVid.setText("Vídeo");
+		btnEnviarFile.setText("Arquivo");
+		
+		final JButton btnEnviarComplexo = new JButton("...");
+		final JPopupMenu menuEnviarComplexo = new JPopupMenu();
+		menuEnviarComplexo.add(btnEnviarImg);
+		menuEnviarComplexo.add(btnEnviarVid);
+		menuEnviarComplexo.add(btnEnviarFile);
+		btnEnviarComplexo.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				menuEnviarComplexo.show(e.getComponent(), e.getX(), e.getY());
+            }
+		});
+		
+
 		jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		jScrollPane1.setAutoscrolls(true);
@@ -44,18 +70,25 @@ public class Interface {
 		layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(layout
 				.createSequentialGroup().addContainerGap()
 				.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-						.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
+						.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
 						.addGroup(layout.createSequentialGroup()
 								.addComponent(entrada, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
 								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addComponent(btnEnviar)))
+								.addComponent(btnEnviar, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
+								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(
+										btnEnviarComplexo, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)))
+				
 				.addContainerGap()));
 		layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(layout.createSequentialGroup().addContainerGap()
-						.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
+						.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)
 						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 						.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-								.addComponent(btnEnviar).addComponent(entrada, javax.swing.GroupLayout.PREFERRED_SIZE,
+								.addComponent(btnEnviar, javax.swing.GroupLayout.PREFERRED_SIZE,
+										javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+								.addComponent(entrada, javax.swing.GroupLayout.PREFERRED_SIZE,
+										javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+								.addComponent(btnEnviarComplexo, javax.swing.GroupLayout.PREFERRED_SIZE,
 										javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
 						.addContainerGap()));
 
