@@ -28,8 +28,8 @@ public class Chat {
 		
 		final JPanel glassPanel = new JPanel();
 		glassPanel.add(painelDeAbertura);
-		glassPanel.add(painelDeUsuarios);
 		glassPanel.add(painelDeChat);
+		glassPanel.add(painelDeUsuarios);
 		
 		Interface.btnConectar.addActionListener((evt) -> {
 			try {
@@ -42,11 +42,10 @@ public class Chat {
 					throw new NomeDeUsuarioInvalido();
 				}
 				
-				Usuario usuario = new Usuario();
-				usuario.setNome(nomeDoUsuario);
+				Usuario usuario = new Usuario(nomeDoUsuario);
 				synchronized (canalPrincipal) {
 					try {
-						canalPrincipal.connect(new JChannel("src/main/resources/udp.xml"));
+						canalPrincipal.connect(new JChannel("src/main/resources/udp.xml"), usuario);
 					} catch (Exception e) {
 						throw new ErroDeConexao();
 					}

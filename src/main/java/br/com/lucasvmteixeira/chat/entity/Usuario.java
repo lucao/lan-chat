@@ -12,9 +12,10 @@ public class Usuario {
 	
 	private String canalConectado;
 	
-	public Usuario() {
+	public Usuario(String nomeDoUsuario) {
 		super();
 		canalConectado = canalPrincipal;
+		this.nome = nomeDoUsuario;
 	}
 	public String getNome() {
 		return nome;

@@ -15,7 +15,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import br.com.lucasvmteixeira.chat.components.JTextAreaObservable;
+
 public class Interface {
+	public static final JTextArea saida = new JTextAreaObservable();
+	
 	public static final JButton btnEnviar = new JButton();
 	public static final JMenuItem btnEnviarImg = new JMenuItem();
 	public static final JMenuItem btnEnviarVid = new JMenuItem();
@@ -35,7 +39,6 @@ public class Interface {
 		JPanel panel = new JPanel();
 
 		JScrollPane jScrollPane1 = new JScrollPane();
-		JTextArea saida = new JTextArea();
 
 		btnEnviar.setText("Enviar");
 

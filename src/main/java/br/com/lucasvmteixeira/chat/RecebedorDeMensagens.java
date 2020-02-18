@@ -1,6 +1,8 @@
 package br.com.lucasvmteixeira.chat;
 
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.jgroups.Address;
 import org.jgroups.Message;
@@ -9,6 +11,7 @@ import org.jgroups.View;
 
 import br.com.lucasvmteixeira.chat.entity.Configuracao;
 import br.com.lucasvmteixeira.chat.entity.Mensagem;
+import br.com.lucasvmteixeira.chat.entity.Usuario;
 import br.com.lucasvmteixeira.chat.net.ChannelWrapper;
 import br.com.lucasvmteixeira.chat.persistence.Mensagens;
 import br.com.lucasvmteixeira.chat.persistence.Usuarios;
@@ -17,14 +20,16 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 	private View lastView;
 	private Usuarios usuarios;
 	private Mensagens mensagens;
-	
-	private ChannelWrapper channel;
 
-	public RecebedorDeMensagens(ChannelWrapper channel) {
+	private ChannelWrapper channel;
+	private final Usuario usuarioConectado;
+
+	public RecebedorDeMensagens(ChannelWrapper channel, Usuario usuarioConectado) {
 		super();
 		this.usuarios = new Usuarios();
 		this.mensagens = new Mensagens();
 		this.channel = channel;
+		this.usuarioConectado = usuarioConectado;
 	}
 
 	@Override
@@ -35,7 +40,7 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 			synchronized (this.usuarios) {
 				if (this.usuarios.getUsuariosConectadosSemIdentificacao().contains(sender)) {
 					this.usuarios.getUsuariosConectadosSemIdentificacao().remove(sender);
-	
+
 					if (!this.usuarios.getUsuariosConectados().containsKey(sender)) {
 						this.usuarios.getUsuariosConectados().put(sender, mensagem.getSender());
 					}
@@ -43,27 +48,43 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 			}
 			synchronized (mensagens) {
 				mensagens.add(mensagem);
+				mensagens.ler(mensagem, mensagem.getSender());
 			}
+
+			Configuracao configuracao = new Configuracao();
+			configuracao.setSender(this.usuarioConectado);
+			configuracao.setMensagemLida(mensagem);
+
+			try {
+				channel.send(null, configuracao);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		} catch (ClassCastException e) {
 			Configuracao configuracao = (Configuracao) msg.getObject();
 			synchronized (this.usuarios) {
 				if (this.usuarios.getUsuariosConectadosSemIdentificacao().contains(sender)) {
 					this.usuarios.getUsuariosConectadosSemIdentificacao().remove(sender);
-	
+
 					if (!this.usuarios.getUsuariosConectados().containsKey(sender)) {
 						this.usuarios.getUsuariosConectados().put(sender, configuracao.getSender());
 					}
 				}
 			}
-			
+
 			synchronized (mensagens) {
 				mensagens.ler(configuracao.getMensagemLida(), configuracao.getSender());
 			}
-			
-			for (Mensagem mensagem: mensagens.naoLidasPor(configuracao.getSender())) {
+
+			for (Mensagem mensagem : mensagens.enviadasPor(this.usuarioConectado).stream()
+					.filter(Predicate.not(mensagens.naoLidasPor(configuracao.getSender())::contains))
+					.collect(Collectors.toList())) {
 				try {
 					channel.send(sender, mensagem);
 				} catch (Exception e1) {
+					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -84,7 +105,7 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 				this.usuarios.getUsuariosConectados().keySet().removeAll(exMembers);
 			}
 		}
-		//TODO atualizar mensagens
+		// TODO atualizar mensagens
 		lastView = view;
 	}
 }
