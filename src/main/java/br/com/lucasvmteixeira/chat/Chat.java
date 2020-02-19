@@ -47,7 +47,9 @@ public class Chat {
 						RecebedorDeMensagens recebedorDeMensagens = new RecebedorDeMensagens(channel, usuario,
 								Interface.saida, Interface.usuarios);
 						canalPrincipal.connect(channel, usuario, recebedorDeMensagens);
+						canalPrincipal.sendNovoUsuario(usuario);
 					} catch (Exception e) {
+						e.printStackTrace();
 						throw new ErroDeConexao();
 					}
 				}
@@ -57,6 +59,7 @@ public class Chat {
 
 				glassPanel.repaint();
 			} catch (NomeDeUsuarioInvalido e) {
+				e.printStackTrace();
 				JOptionPane.showMessageDialog(null, "Nome inválido");
 			} catch (ErroDeConexao e) {
 				JOptionPane.showMessageDialog(null, "Erro ao tentar conectar");
@@ -77,7 +80,7 @@ public class Chat {
 		});
 
 		Interface.btnIniciarChat.addActionListener((evt) -> {
-			// TODO
+			canalPrincipal.close();
 		});
 
 		frame.getContentPane().add(glassPanel);

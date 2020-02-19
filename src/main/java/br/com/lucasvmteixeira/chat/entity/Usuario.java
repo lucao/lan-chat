@@ -1,10 +1,16 @@
 package br.com.lucasvmteixeira.chat.entity;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-public class Usuario {
-	private static final String canalPrincipal = "channel";
+public class Usuario implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6747522460337961540L;
+
+	public static final String canalPrincipal = "channel";
 	
 	private String nome;
 	private transient Collection<GrupoPrivado> gruposPrivados;

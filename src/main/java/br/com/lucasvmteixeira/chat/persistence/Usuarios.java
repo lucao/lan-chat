@@ -15,15 +15,15 @@ import br.com.lucasvmteixeira.chat.entity.Usuario;
 public class Usuarios {
 	private Map<Address, Usuario> usuariosConectados;
 	private Set<Address> usuariosConectadosSemIdentificacao;
-	
+
 	private List<Atualizavel> observables;
-	
+
 	public Usuarios() {
 		this.observables = new ArrayList<Atualizavel>();
 		this.usuariosConectados = new HashMap<Address, Usuario>();
 		this.usuariosConectadosSemIdentificacao = new HashSet<Address>();
 	}
-	
+
 	public void addObserver(Atualizavel o) {
 		this.observables.add(o);
 	}
@@ -31,22 +31,28 @@ public class Usuarios {
 	public void putUsuarioConectado(Address sender, Usuario usuarioSender) {
 		this.usuariosConectados.put(sender, usuarioSender);
 		this.usuariosConectadosSemIdentificacao.remove(sender);
+		for (Atualizavel o : this.observables) {
+			o.atualizar(this.usuariosConectados.values());
+		}
 	}
 
 	public boolean containsUsuario(Address sender) {
 		return this.usuariosConectados.containsKey(sender);
 	}
-	
+
 	public boolean containsUsuarioSemIdentificacao(Address sender) {
 		return this.usuariosConectadosSemIdentificacao.contains(sender);
 	}
 
 	public void addUsuariosSemIdentificacao(List<Address> members) {
-		this.usuariosConectadosSemIdentificacao.addAll(members);		
+		this.usuariosConectadosSemIdentificacao.addAll(members);
 	}
-	
+
 	public void removeUsuarios(List<Address> members) {
-		this.usuariosConectadosSemIdentificacao.removeAll(members);		
+		this.usuariosConectadosSemIdentificacao.removeAll(members);
 		this.usuariosConectados.keySet().removeAll(members);
+		for (Atualizavel o : this.observables) {
+			o.atualizar(this.usuariosConectados.values());
+		}
 	}
 }

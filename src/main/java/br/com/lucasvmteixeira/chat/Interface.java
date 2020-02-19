@@ -34,7 +34,7 @@ public class Interface {
 
 	public static final JButton btnIniciarChat = new JButton();
 
-	public static final JListObservable<String> usuarios = new JListObservable<String>();
+	public static final JListObservable usuarios = new JListObservable();
 
 	public static JPanel construirPainelDeChat() {
 		JPanel panel = new JPanel();

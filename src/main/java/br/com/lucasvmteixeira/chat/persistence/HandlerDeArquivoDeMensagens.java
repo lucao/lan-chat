@@ -42,8 +42,17 @@ public class HandlerDeArquivoDeMensagens implements CompletionHandler<Integer, B
 				if (!isEOL(lastCharRead)) {
 
 					final Mensagem mensagem = this.gson.fromJson(builder.toString(), Mensagem.class);
-					synchronized (this.mensagens) {
-						this.mensagens.add(mensagem);
+					if (mensagem != null) {
+						if (mensagem.getDataDeEnvio() != null && mensagem.getMensagem() != null
+								&& mensagem.getSender() != null) {
+							synchronized (this.mensagens) {
+								this.mensagens.add(mensagem);
+							}
+						} else {
+							System.out.println(builder.toString());
+						}
+					} else {
+						System.out.println(builder.toString());
 					}
 
 					position += numeroDeBytesLidos;

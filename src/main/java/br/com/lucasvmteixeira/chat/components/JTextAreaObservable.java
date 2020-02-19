@@ -25,9 +25,10 @@ public class JTextAreaObservable extends JTextArea implements Atualizavel {
 			builder.append(new SimpleDateFormat("dd/MM/yyyy hh:mm").format(mensagem.getDataDeEnvio()));
 			builder.append('\n');
 			builder.append(mensagem.getMensagem());
+			builder.append('\n');
+			builder.append('\n');
 			this.append(builder.toString());
 		} catch (ClassCastException e) {
-			e.printStackTrace();
 			return;
 		}
 	}

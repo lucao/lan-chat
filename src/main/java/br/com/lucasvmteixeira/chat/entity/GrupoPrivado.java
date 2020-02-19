@@ -1,9 +1,15 @@
 package br.com.lucasvmteixeira.chat.entity;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-public class GrupoPrivado {
+public class GrupoPrivado implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3898530148223626334L;
+	
 	private String nome;
 	private Collection<Usuario> usuarios;
 	private transient List<Mensagem> mensagens;
