@@ -96,9 +96,18 @@ public class Chat {
 				try {
 					String textoDaMensagem = Interface.entrada.getText();
 					if (textoDaMensagem.length() > 0) {
-						canalPrincipal.send(textoDaMensagem);
+						if (textoDaMensagem.length() <= 2048) {
+							canalPrincipal.send(textoDaMensagem);
+						} else {
+							int n = JOptionPane.showConfirmDialog(null,
+									"Mensagem muito grande para ser enviada no chat. Deseja enviar a mensagem como um arquivo de texto?",
+									"Erro ao enviar mensagem", JOptionPane.YES_NO_OPTION);
+							if (n == JOptionPane.OK_CANCEL_OPTION) {
+								//TODO
+							}
+						}
 					}
-					
+
 					Interface.entrada.setText("");
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(null, "Erro ao tentar enviar a mensagem");
