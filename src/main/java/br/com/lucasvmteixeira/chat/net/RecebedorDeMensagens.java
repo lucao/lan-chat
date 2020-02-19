@@ -34,6 +34,7 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 
 		for (Atualizavel o : observers) {
 			this.mensagens.addObserver(o);
+			this.usuarios.addObserver(o);
 		}
 	}
 
@@ -43,11 +44,9 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 		try {
 			Mensagem mensagem = (Mensagem) msg.getObject();
 			synchronized (this.usuarios) {
-				if (this.usuarios.getUsuariosConectadosSemIdentificacao().contains(sender)) {
-					this.usuarios.getUsuariosConectadosSemIdentificacao().remove(sender);
-
-					if (!this.usuarios.getUsuariosConectados().containsKey(sender)) {
-						this.usuarios.getUsuariosConectados().put(sender, mensagem.getSender());
+				if (this.usuarios.containsUsuarioSemIdentificacao(sender)) {
+					if (!this.usuarios.containsUsuario(sender)) {
+						this.usuarios.putUsuarioConectado(sender, mensagem.getSender());
 					}
 				}
 			}
@@ -63,18 +62,15 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 			try {
 				channel.send(null, configuracao);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
 		} catch (ClassCastException e) {
 			Configuracao configuracao = (Configuracao) msg.getObject();
 			synchronized (this.usuarios) {
-				if (this.usuarios.getUsuariosConectadosSemIdentificacao().contains(sender)) {
-					this.usuarios.getUsuariosConectadosSemIdentificacao().remove(sender);
-
-					if (!this.usuarios.getUsuariosConectados().containsKey(sender)) {
-						this.usuarios.getUsuariosConectados().put(sender, configuracao.getSender());
+				if (this.usuarios.containsUsuarioSemIdentificacao(sender)) {
+					if (!this.usuarios.containsUsuario(sender)) {
+						this.usuarios.putUsuarioConectado(sender, configuracao.getSender());
 					}
 				}
 			}
@@ -89,7 +85,6 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 				try {
 					channel.send(sender, mensagem);
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -100,14 +95,14 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 	public void viewAccepted(View view) {
 		if (lastView == null) {
 			synchronized (this.usuarios) {
-				this.usuarios.getUsuariosConectadosSemIdentificacao().addAll(view.getMembers());
+				this.usuarios.addUsuariosSemIdentificacao(view.getMembers());
 			}
 		} else {
 			List<Address> newMembers = View.newMembers(lastView, view);
 			List<Address> exMembers = View.leftMembers(lastView, view);
 			synchronized (this.usuarios) {
-				this.usuarios.getUsuariosConectadosSemIdentificacao().addAll(newMembers);
-				this.usuarios.getUsuariosConectados().keySet().removeAll(exMembers);
+				this.usuarios.addUsuariosSemIdentificacao(newMembers);
+				this.usuarios.removeUsuarios(exMembers);
 			}
 		}
 		// TODO atualizar mensagens

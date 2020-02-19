@@ -13,7 +13,7 @@ public class JListObservable<T> extends JList<T> implements Atualizavel {
 
 	@Override
 	public void atualizar(Object o) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 

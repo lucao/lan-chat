@@ -1,8 +1,11 @@
 package br.com.lucasvmteixeira.chat.components;
 
+import java.text.SimpleDateFormat;
+
 import javax.swing.JTextArea;
 
 import br.com.lucasvmteixeira.chat.Atualizavel;
+import br.com.lucasvmteixeira.chat.entity.Mensagem;
 
 public class JTextAreaObservable extends JTextArea implements Atualizavel {
 
@@ -13,8 +16,20 @@ public class JTextAreaObservable extends JTextArea implements Atualizavel {
 
 	@Override
 	public void atualizar(Object o) {
-		// TODO Auto-generated method stub
-		
+		try {
+			Mensagem mensagem = (Mensagem) o;
+			StringBuilder builder = new StringBuilder();
+			builder.append("Enviado por: ");
+			builder.append(mensagem.getSender().getNome());
+			builder.append(" em ");
+			builder.append(new SimpleDateFormat("dd/MM/yyyy hh:mm").format(mensagem.getDataDeEnvio()));
+			builder.append('\n');
+			builder.append(mensagem.getMensagem());
+			this.append(builder.toString());
+		} catch (ClassCastException e) {
+			e.printStackTrace();
+			return;
+		}
 	}
-	
+
 }
