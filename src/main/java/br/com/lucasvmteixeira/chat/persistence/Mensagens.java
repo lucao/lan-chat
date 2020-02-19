@@ -22,7 +22,6 @@ import br.com.lucasvmteixeira.chat.entity.Usuario;
 
 public class Mensagens {
 	private Set<Mensagem> mensagens;
-	
 	private HandlerDeArquivoDeMensagens handler;
 
 	private List<Atualizavel> observables;

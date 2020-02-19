@@ -11,7 +11,9 @@ import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
@@ -20,6 +22,8 @@ import br.com.lucasvmteixeira.chat.components.JTextAreaObservable;
 
 public class Interface {
 	public static final JTextAreaObservable saida = new JTextAreaObservable();
+
+	public static final JTabbedPane tabbedPaneForChats = new JTabbedPane();
 
 	public static final JButton btnEnviar = new JButton();
 	public static final JMenuItem btnEnviarImg = new JMenuItem();
@@ -35,6 +39,11 @@ public class Interface {
 	public static final JButton btnIniciarChat = new JButton();
 
 	public static final JListObservable usuarios = new JListObservable();
+
+	public static JPanel construirPainelDePrivado() {
+		return null;
+		// TODO
+	}
 
 	public static JPanel construirPainelDeChat() {
 		JPanel panel = new JPanel();
@@ -151,6 +160,20 @@ public class Interface {
 								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
 				.addContainerGap()));
 
+		return panel;
+	}
+
+	public static JPanel construirPainelDeAcompanhamentoDeProgressoIndefinido() {
+		JPanel panel = new JPanel();
+
+		JProgressBar progressBar = new JProgressBar(0, 2000);
+		progressBar.setBounds(40, 40, 160, 30);
+		
+		progressBar.setIndeterminate(true);
+		
+		panel.add(new JLabel("Aguarde..."));
+		panel.add(progressBar);
+		
 		return panel;
 	}
 }

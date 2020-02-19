@@ -2,6 +2,7 @@ package br.com.lucasvmteixeira.chat;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.concurrent.CompletableFuture;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -14,7 +15,7 @@ import br.com.lucasvmteixeira.chat.net.ChannelWrapper;
 import br.com.lucasvmteixeira.chat.net.RecebedorDeMensagens;
 
 public class Chat {
-	private static ChannelWrapper canalPrincipal = new ChannelWrapper();
+	private static final ChannelWrapper canalPrincipal = new ChannelWrapper();
 
 	public static void main(String[] args) {
 		JFrame frame = new JFrame();
@@ -22,12 +23,18 @@ public class Chat {
 
 		final JPanel painelDeAbertura = Interface.construirPainelDeAbertura();
 		painelDeAbertura.setVisible(true);
-		final JPanel painelDeChat = Interface.construirPainelDeChat();
-		painelDeChat.setVisible(false);
+		final JPanel painelDeAcompanhamentoDeProgressoIndefinido = Interface
+				.construirPainelDeAcompanhamentoDeProgressoIndefinido();
+		painelDeAcompanhamentoDeProgressoIndefinido.setVisible(false);
+
+		final JPanel painelDeChatPrincipal = Interface.construirPainelDeChat();
+		Interface.tabbedPaneForChats.add("Principal", painelDeChatPrincipal);
+		Interface.tabbedPaneForChats.setVisible(false);
 
 		final JPanel glassPanel = new JPanel();
 		glassPanel.add(painelDeAbertura);
-		glassPanel.add(painelDeChat);
+		glassPanel.add(painelDeAcompanhamentoDeProgressoIndefinido);
+		glassPanel.add(Interface.tabbedPaneForChats);
 
 		Interface.btnConectar.addActionListener((evt) -> {
 			try {
@@ -40,29 +47,47 @@ public class Chat {
 					throw new NomeDeUsuarioInvalido();
 				}
 
-				Usuario usuario = new Usuario(nomeDoUsuario);
-				synchronized (canalPrincipal) {
-					try {
-						JChannel channel = new JChannel("src/main/resources/udp.xml");
-						RecebedorDeMensagens recebedorDeMensagens = new RecebedorDeMensagens(channel, usuario,
-								Interface.saida, Interface.usuarios);
-						canalPrincipal.connect(channel, usuario, recebedorDeMensagens);
-						canalPrincipal.sendNovoUsuario(usuario);
-					} catch (Exception e) {
-						e.printStackTrace();
-						throw new ErroDeConexao();
-					}
-				}
+				final Usuario usuario = new Usuario(nomeDoUsuario);
+
+				final CompletableFuture<String> c1 = new CompletableFuture<>();
 
 				painelDeAbertura.setVisible(false);
-				painelDeChat.setVisible(true);
-
+				painelDeAcompanhamentoDeProgressoIndefinido.setVisible(true);
+				Interface.tabbedPaneForChats.setVisible(false);
 				glassPanel.repaint();
+				new Thread(() -> {
+					synchronized (canalPrincipal) {
+						try {
+							JChannel channel = new JChannel("src/main/resources/udp.xml");
+							RecebedorDeMensagens recebedorDeMensagens = new RecebedorDeMensagens(channel, usuario,
+									Interface.saida, Interface.usuarios);
+							canalPrincipal.connect(channel, usuario, recebedorDeMensagens);
+							canalPrincipal.sendNovoUsuario(usuario);
+						} catch (Exception e) {
+							e.printStackTrace();
+							c1.completeExceptionally(new ErroDeConexao());
+						}
+					}
+					c1.complete("OK");
+				}).start();
+
+				c1.exceptionally(ex -> {
+					JOptionPane.showMessageDialog(null, "Erro ao tentar conectar");
+					return "erro";
+				});
+				c1.thenAccept(str -> {
+					if (str == "OK") {
+						painelDeAbertura.setVisible(false);
+						painelDeAcompanhamentoDeProgressoIndefinido.setVisible(false);
+						Interface.tabbedPaneForChats.setVisible(true);
+
+						glassPanel.repaint();
+					}
+				});
+
 			} catch (NomeDeUsuarioInvalido e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(null, "Nome inválido");
-			} catch (ErroDeConexao e) {
-				JOptionPane.showMessageDialog(null, "Erro ao tentar conectar");
 			}
 		});
 
@@ -73,6 +98,8 @@ public class Chat {
 					if (textoDaMensagem.length() > 0) {
 						canalPrincipal.send(textoDaMensagem);
 					}
+					
+					Interface.entrada.setText("");
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(null, "Erro ao tentar enviar a mensagem");
 				}
@@ -80,7 +107,7 @@ public class Chat {
 		});
 
 		Interface.btnIniciarChat.addActionListener((evt) -> {
-			canalPrincipal.close();
+
 		});
 
 		frame.getContentPane().add(glassPanel);
@@ -89,7 +116,7 @@ public class Chat {
 		frame.setLocationRelativeTo(null);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) {
-				// TODO
+				canalPrincipal.close();
 			}
 		});
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -27,12 +27,16 @@ public class ChannelWrapper {
 		m.setDataDeEnvio(new Date());
 		m.setSender(this.usuario);
 		m.setMensagem(mensagem);
+		
+		//TODO controle assíncrono de envio
 		this.channel.send(null, m);
 	}
 
 	public void sendNovoUsuario(Usuario usuario) throws Exception {
 		Configuracao c = new Configuracao();
 		c.setSender(usuario);
+		
+		//TODO controle assíncrono de envio
 		this.channel.send(null, c);
 	}
 
