@@ -1,7 +1,7 @@
 package br.com.lucasvmteixeira.chat;
 
-import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -11,6 +11,7 @@ import org.jgroups.JChannel;
 
 import br.com.lucasvmteixeira.chat.entity.Usuario;
 import br.com.lucasvmteixeira.chat.net.ChannelWrapper;
+import br.com.lucasvmteixeira.chat.net.RecebedorDeMensagens;
 
 public class Chat {
 	private static ChannelWrapper canalPrincipal = new ChannelWrapper();
@@ -62,11 +63,21 @@ public class Chat {
 			}
 		});
 
-		Interface.btnIniciarChat.addActionListener((evt) -> {
-			painelDeAbertura.setVisible(false);
-			painelDeChat.setVisible(true);
+		Interface.btnEnviar.addActionListener((evt) -> {
+			synchronized (canalPrincipal) {
+				try {
+					String textoDaMensagem = Interface.entrada.getText();
+					if (textoDaMensagem.length() > 0) {
+						canalPrincipal.send(textoDaMensagem);
+					}
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(null, "Erro ao tentar enviar a mensagem");
+				}
+			}
+		});
 
-			glassPanel.repaint();
+		Interface.btnIniciarChat.addActionListener((evt) -> {
+			// TODO
 		});
 
 		frame.getContentPane().add(glassPanel);

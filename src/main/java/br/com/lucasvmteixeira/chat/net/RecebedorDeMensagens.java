@@ -1,4 +1,4 @@
-package br.com.lucasvmteixeira.chat;
+package br.com.lucasvmteixeira.chat.net;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -10,6 +10,7 @@ import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
 
+import br.com.lucasvmteixeira.chat.Atualizavel;
 import br.com.lucasvmteixeira.chat.entity.Configuracao;
 import br.com.lucasvmteixeira.chat.entity.Mensagem;
 import br.com.lucasvmteixeira.chat.entity.Usuario;

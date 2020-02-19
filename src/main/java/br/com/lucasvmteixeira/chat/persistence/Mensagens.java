@@ -1,11 +1,8 @@
 package br.com.lucasvmteixeira.chat.persistence;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
-import java.nio.channels.CompletionHandler;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -25,8 +22,8 @@ import br.com.lucasvmteixeira.chat.entity.Usuario;
 
 public class Mensagens {
 	private Set<Mensagem> mensagens;
-
-	private static long position = 0;
+	
+	private HandlerDeArquivoDeMensagens handler;
 
 	private List<Atualizavel> observables;
 
@@ -34,13 +31,16 @@ public class Mensagens {
 		super();
 		this.mensagens = new HashSet<Mensagem>();
 		this.observables = new ArrayList<Atualizavel>();
+		
+		readFile();
 
+	}
+
+	private void readFile() {
 		Path path = Paths.get("data.dat");
 
 		boolean pathExists = Files.exists(path, new LinkOption[] { LinkOption.NOFOLLOW_LINKS });
-
 		AsynchronousFileChannel fileChannel;
-
 		try {
 			if (pathExists) {
 				fileChannel = AsynchronousFileChannel.open(path, StandardOpenOption.READ, StandardOpenOption.WRITE);
@@ -49,34 +49,11 @@ public class Mensagens {
 			}
 
 			ByteBuffer buffer = ByteBuffer.allocate(1024);
-			fileChannel.read(buffer, position, buffer, new CompletionHandler<Integer, ByteBuffer>() {
-				@Override
-				public void completed(Integer result, ByteBuffer attachment) {
-					StringBuilder builder = new StringBuilder();
-					attachment.flip();
-
-					char lastCharRead = (char) attachment.get();
-					builder.append(lastCharRead);
-					while (attachment.hasRemaining() && !isEOL(lastCharRead))
-						position++;
-						builder.append(attachment.get());
-					attachment.clear();
-				}
-
-				private boolean isEOL(char character) {
-					return ((character == '\n') || (character == '\r')) ? true : false;
-				}
-
-				@Override
-				public void failed(Throwable exc, ByteBuffer attachment) {
-
-				}
-			});
+			this.handler = new HandlerDeArquivoDeMensagens(this);
+			fileChannel.read(buffer, this.handler.getPosition(), buffer, this.handler);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	public void addObserver(Atualizavel a) {
