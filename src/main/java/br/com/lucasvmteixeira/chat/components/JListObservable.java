@@ -1,20 +1,20 @@
 package br.com.lucasvmteixeira.chat.components;
 
-import javax.swing.JTextArea;
+import javax.swing.JList;
 
 import br.com.lucasvmteixeira.chat.Atualizavel;
 
-public class JTextAreaObservable extends JTextArea implements Atualizavel {
+public class JListObservable<T> extends JList<T> implements Atualizavel {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 7238100695416133973L;
+	private static final long serialVersionUID = 3648186686515496324L;
 
 	@Override
 	public void atualizar(Object o) {
 		// TODO Auto-generated method stub
 		
 	}
-	
+
 }

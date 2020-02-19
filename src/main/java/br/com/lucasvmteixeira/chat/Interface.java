@@ -1,9 +1,9 @@
 package br.com.lucasvmteixeira.chat;
 
-import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -12,14 +12,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 
+import br.com.lucasvmteixeira.chat.components.JListObservable;
 import br.com.lucasvmteixeira.chat.components.JTextAreaObservable;
 
 public class Interface {
-	public static final JTextArea saida = new JTextAreaObservable();
-	
+	public static final JTextAreaObservable saida = new JTextAreaObservable();
+
 	public static final JButton btnEnviar = new JButton();
 	public static final JMenuItem btnEnviarImg = new JMenuItem();
 	public static final JMenuItem btnEnviarVid = new JMenuItem();
@@ -33,12 +34,14 @@ public class Interface {
 
 	public static final JButton btnIniciarChat = new JButton();
 
-	public static final JList<String> usuarios = new JList<String>();
+	public static final JListObservable<String> usuarios = new JListObservable<String>();
 
 	public static JPanel construirPainelDeChat() {
 		JPanel panel = new JPanel();
 
 		JScrollPane jScrollPane1 = new JScrollPane();
+
+		JPanel painelDeUsuarios = Interface.construirPainelDeUsuarios();
 
 		btnEnviar.setText("Enviar");
 
@@ -46,7 +49,7 @@ public class Interface {
 		btnEnviarImg.setText("Imagem");
 		btnEnviarVid.setText("Vídeo");
 		btnEnviarFile.setText("Arquivo");
-		
+
 		final JButton btnEnviarComplexo = new JButton("...");
 		final JPopupMenu menuEnviarComplexo = new JPopupMenu();
 		menuEnviarComplexo.add(btnEnviarImg);
@@ -55,9 +58,8 @@ public class Interface {
 		btnEnviarComplexo.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				menuEnviarComplexo.show(e.getComponent(), e.getX(), e.getY());
-            }
+			}
 		});
-		
 
 		jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -80,20 +82,23 @@ public class Interface {
 								.addComponent(btnEnviar, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
 								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(
 										btnEnviarComplexo, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)))
-				
+				.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+						.addComponent(painelDeUsuarios, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))
 				.addContainerGap()));
-		layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(layout.createSequentialGroup().addContainerGap()
+		layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(layout
+				.createSequentialGroup().addContainerGap()
+				.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
 						.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)
-						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-						.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-								.addComponent(btnEnviar, javax.swing.GroupLayout.PREFERRED_SIZE,
-										javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-								.addComponent(entrada, javax.swing.GroupLayout.PREFERRED_SIZE,
-										javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-								.addComponent(btnEnviarComplexo, javax.swing.GroupLayout.PREFERRED_SIZE,
-										javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-						.addContainerGap()));
+						.addComponent(painelDeUsuarios, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))
+				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+				.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(btnEnviar, javax.swing.GroupLayout.PREFERRED_SIZE,
+								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addComponent(entrada, javax.swing.GroupLayout.PREFERRED_SIZE,
+								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnEnviarComplexo, javax.swing.GroupLayout.PREFERRED_SIZE,
+								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+				.addContainerGap()));
 
 		return panel;
 	}
@@ -106,8 +111,10 @@ public class Interface {
 		JScrollPane spane = new JScrollPane();
 		spane.getViewport().add(usuarios);
 
-		JLabel label = new JLabel("Aguirre, der Zorn Gottes");
-		label.setFont(new Font("Serif", Font.PLAIN, 12));
+		usuarios.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		usuarios.setLayoutOrientation(JList.VERTICAL);
+		usuarios.setModel(new DefaultListModel<String>());
+		JLabel label = new JLabel("Lista de usuários conectados");
 
 		GroupLayout gl = new GroupLayout(panel);
 		panel.setLayout(gl);

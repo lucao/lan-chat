@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.jgroups.Address;
+import org.jgroups.JChannel;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
@@ -12,7 +13,6 @@ import org.jgroups.View;
 import br.com.lucasvmteixeira.chat.entity.Configuracao;
 import br.com.lucasvmteixeira.chat.entity.Mensagem;
 import br.com.lucasvmteixeira.chat.entity.Usuario;
-import br.com.lucasvmteixeira.chat.net.ChannelWrapper;
 import br.com.lucasvmteixeira.chat.persistence.Mensagens;
 import br.com.lucasvmteixeira.chat.persistence.Usuarios;
 
@@ -21,15 +21,19 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 	private Usuarios usuarios;
 	private Mensagens mensagens;
 
-	private ChannelWrapper channel;
+	private JChannel channel;
 	private final Usuario usuarioConectado;
 
-	public RecebedorDeMensagens(ChannelWrapper channel, Usuario usuarioConectado) {
+	public RecebedorDeMensagens(JChannel channel, Usuario usuarioConectado, Atualizavel... observers) {
 		super();
 		this.usuarios = new Usuarios();
 		this.mensagens = new Mensagens();
 		this.channel = channel;
 		this.usuarioConectado = usuarioConectado;
+
+		for (Atualizavel o : observers) {
+			this.mensagens.addObserver(o);
+		}
 	}
 
 	@Override

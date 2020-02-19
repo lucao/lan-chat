@@ -6,7 +6,7 @@ import java.util.List;
 public class GrupoPrivado {
 	private String nome;
 	private Collection<Usuario> usuarios;
-	private List<Mensagem> mensagens;
+	private transient List<Mensagem> mensagens;
 	
 	public String getNome() {
 		return nome;

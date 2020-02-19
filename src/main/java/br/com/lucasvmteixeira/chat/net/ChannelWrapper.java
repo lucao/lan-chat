@@ -12,9 +12,9 @@ import br.com.lucasvmteixeira.chat.entity.Usuario;
 public class ChannelWrapper {
 	private JChannel channel;
 
-	public ChannelWrapper connect(JChannel channel, Usuario usuario) {
+	public ChannelWrapper connect(JChannel channel, Usuario usuario, RecebedorDeMensagens recebedorDeMensagens) {
 		this.channel = channel;
-		this.channel.setReceiver(new RecebedorDeMensagens(this, usuario));
+		this.channel.setReceiver(recebedorDeMensagens);
 		return this;
 	}
 

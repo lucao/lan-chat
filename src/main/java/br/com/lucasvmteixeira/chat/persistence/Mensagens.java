@@ -1,6 +1,16 @@
 package br.com.lucasvmteixeira.chat.persistence;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.channels.CompletionHandler;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,17 +25,60 @@ import br.com.lucasvmteixeira.chat.entity.Usuario;
 
 public class Mensagens {
 	private Set<Mensagem> mensagens;
-	
-	private File arquivoLocalDeDados;
-	
+
+	private static long position = 0;
+
 	private List<Atualizavel> observables;
 
 	public Mensagens() {
 		super();
 		this.mensagens = new HashSet<Mensagem>();
 		this.observables = new ArrayList<Atualizavel>();
+
+		Path path = Paths.get("data.dat");
+
+		boolean pathExists = Files.exists(path, new LinkOption[] { LinkOption.NOFOLLOW_LINKS });
+
+		AsynchronousFileChannel fileChannel;
+
+		try {
+			if (pathExists) {
+				fileChannel = AsynchronousFileChannel.open(path, StandardOpenOption.READ, StandardOpenOption.WRITE);
+			} else {
+				fileChannel = AsynchronousFileChannel.open(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+			}
+
+			ByteBuffer buffer = ByteBuffer.allocate(1024);
+			fileChannel.read(buffer, position, buffer, new CompletionHandler<Integer, ByteBuffer>() {
+				@Override
+				public void completed(Integer result, ByteBuffer attachment) {
+					StringBuilder builder = new StringBuilder();
+					attachment.flip();
+
+					char lastCharRead = (char) attachment.get();
+					builder.append(lastCharRead);
+					while (attachment.hasRemaining() && !isEOL(lastCharRead))
+						position++;
+						builder.append(attachment.get());
+					attachment.clear();
+				}
+
+				private boolean isEOL(char character) {
+					return ((character == '\n') || (character == '\r')) ? true : false;
+				}
+
+				@Override
+				public void failed(Throwable exc, ByteBuffer attachment) {
+
+				}
+			});
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
-	
+
 	public void addObserver(Atualizavel a) {
 		this.observables.add(a);
 	}
@@ -37,9 +90,12 @@ public class Mensagens {
 	public Map<GrupoPrivado, List<Mensagem>> porGrupo() {
 		return mensagens.stream().collect(Collectors.groupingBy(Mensagem::getGrupo));
 	}
-	
+
 	public void add(Mensagem mensagem) {
 		mensagens.add(mensagem);
+		for (Atualizavel o : this.observables) {
+			o.atualizar(mensagem);
+		}
 	}
 
 	public Set<Mensagem> naoLidasPor(Usuario sender) {

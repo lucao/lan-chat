@@ -7,8 +7,8 @@ public class Usuario {
 	private static final String canalPrincipal = "channel";
 	
 	private String nome;
-	private Collection<GrupoPrivado> gruposPrivados;
-	private List<Mensagem> conversas;
+	private transient Collection<GrupoPrivado> gruposPrivados;
+	private transient List<Mensagem> conversas;
 	
 	private String canalConectado;
 	
