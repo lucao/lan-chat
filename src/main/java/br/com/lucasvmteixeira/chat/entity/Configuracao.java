@@ -10,6 +10,7 @@ public class Configuracao implements Serializable {
 	
 	private Usuario sender;
 	private Mensagem mensagemLida;
+	
 
 	public Usuario getSender() {
 		return sender;

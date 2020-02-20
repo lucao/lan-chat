@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
+import org.jgroups.Address;
+
 public class Usuario implements Serializable {
 	/**
 	 * 
@@ -13,16 +15,11 @@ public class Usuario implements Serializable {
 	public static final String canalPrincipal = "channel";
 	
 	private String nome;
-	private transient Collection<GrupoPrivado> gruposPrivados;
+	private Collection<GrupoPrivado> gruposPrivados;
 	private transient List<Mensagem> conversas;
 	
-	private String canalConectado;
+	private transient Address enderecoConectado;
 	
-	public Usuario(String nomeDoUsuario) {
-		super();
-		canalConectado = canalPrincipal;
-		this.nome = nomeDoUsuario;
-	}
 	public String getNome() {
 		return nome;
 	}
@@ -35,16 +32,16 @@ public class Usuario implements Serializable {
 	public void setGruposPrivados(Collection<GrupoPrivado> gruposPrivados) {
 		this.gruposPrivados = gruposPrivados;
 	}
-	public String getCanalConectado() {
-		return canalConectado;
-	}
-	public void setCanalConectado(String canalConectado) {
-		this.canalConectado = canalConectado;
-	}
 	public List<Mensagem> getConversas() {
 		return conversas;
 	}
 	public void setConversas(List<Mensagem> conversas) {
 		this.conversas = conversas;
+	}
+	public Address getEnderecoConectado() {
+		return enderecoConectado;
+	}
+	public void setEnderecoConectado(Address enderecoConectado) {
+		this.enderecoConectado = enderecoConectado;
 	}
 }

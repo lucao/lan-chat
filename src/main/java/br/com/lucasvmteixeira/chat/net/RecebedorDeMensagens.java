@@ -40,12 +40,14 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 
 	@Override
 	public void receive(Message msg) {
+		System.out.println(msg.toString());
 		Address sender = msg.getSrc();
 		try {
 			Mensagem mensagem = (Mensagem) msg.getObject();
 			synchronized (this.usuarios) {
 				if (this.usuarios.containsUsuarioSemIdentificacao(sender)) {
 					if (!this.usuarios.containsUsuario(sender)) {
+						mensagem.getSender().setEnderecoConectado(sender);
 						this.usuarios.putUsuarioConectado(sender, mensagem.getSender());
 					}
 				}
@@ -70,7 +72,16 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 			synchronized (this.usuarios) {
 				if (this.usuarios.containsUsuarioSemIdentificacao(sender)) {
 					if (!this.usuarios.containsUsuario(sender)) {
+						configuracao.getSender().setEnderecoConectado(sender);
 						this.usuarios.putUsuarioConectado(sender, configuracao.getSender());
+						
+						Configuracao c = new Configuracao();
+						c.setSender(this.usuarioConectado);
+						try {
+							channel.send(sender, c);
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
 					}
 				}
 			}

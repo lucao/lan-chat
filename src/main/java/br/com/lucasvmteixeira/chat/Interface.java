@@ -5,7 +5,6 @@ import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -15,15 +14,15 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
 import br.com.lucasvmteixeira.chat.components.JListObservable;
+import br.com.lucasvmteixeira.chat.components.JTabbedPaneObservable;
 import br.com.lucasvmteixeira.chat.components.JTextAreaObservable;
 
 public class Interface {
-	public static final JTabbedPane tabbedPaneForChats = new JTabbedPane();
+	public static final JTabbedPaneObservable tabbedPaneForChats = new JTabbedPaneObservable();
 
 	public static final JButton btnEnviar = new JButton();
 	public static final JMenuItem btnEnviarImg = new JMenuItem();
@@ -46,7 +45,7 @@ public class Interface {
 
 	public static final JListObservable usuarios = new JListObservable();
 
-	public static JPanel construirPainelDeChatPrivado(Object identificador) {
+	public static void construirPainelDeChatPrivado(Object identificador) {
 		JPanel panel = new JPanel();
 
 		JScrollPane jScrollPane1 = new JScrollPane();
@@ -119,7 +118,13 @@ public class Interface {
 										javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
 						.addContainerGap()));
 
-		return panel;
+		tabbedPaneForChats.add(panel);
+		
+		tabbedPaneForChats.repaint();
+	}
+	
+	public static void destruirPainelDeChatPrivado(Object identificador) {
+		//TODO
 	}
 
 	public static JPanel construirPainelDeChat() {
@@ -153,6 +158,7 @@ public class Interface {
 		saida.setColumns(20);
 		saida.setLineWrap(true);
 		saida.setRows(5);
+		saida.setEditable(false);
 		jScrollPane1.setViewportView(saida);
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -195,9 +201,8 @@ public class Interface {
 		JScrollPane spane = new JScrollPane();
 		spane.getViewport().add(usuarios);
 
-		usuarios.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		usuarios.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		usuarios.setLayoutOrientation(JList.VERTICAL);
-		usuarios.setModel(new DefaultListModel<String>());
 		JLabel label = new JLabel("Lista de usuários conectados");
 
 		GroupLayout gl = new GroupLayout(panel);

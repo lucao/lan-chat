@@ -15,7 +15,7 @@ public class JTextAreaObservable extends JTextArea implements Atualizavel {
 	private static final long serialVersionUID = 7238100695416133973L;
 
 	@Override
-	public void atualizar(Object o) {
+	public synchronized void atualizar(Object o) {
 		try {
 			Mensagem mensagem = (Mensagem) o;
 			StringBuilder builder = new StringBuilder();

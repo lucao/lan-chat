@@ -36,6 +36,8 @@ public class Chat {
 		glassPanel.add(painelDeAcompanhamentoDeProgressoIndefinido);
 		glassPanel.add(Interface.tabbedPaneForChats);
 
+		final Usuario usuarioConectado = new Usuario();
+
 		Interface.btnConectar.addActionListener((evt) -> {
 			try {
 				String nomeDoUsuario = Interface.nickname.getText();
@@ -47,22 +49,24 @@ public class Chat {
 					throw new NomeDeUsuarioInvalido();
 				}
 
-				final Usuario usuario = new Usuario(nomeDoUsuario);
+				usuarioConectado.setNome(nomeDoUsuario);
 
 				final CompletableFuture<String> c1 = new CompletableFuture<>();
 
 				painelDeAbertura.setVisible(false);
-				painelDeAcompanhamentoDeProgressoIndefinido.setVisible(true);
 				Interface.tabbedPaneForChats.setVisible(false);
+				painelDeAcompanhamentoDeProgressoIndefinido.setVisible(true);
+
 				glassPanel.repaint();
 				new Thread(() -> {
 					synchronized (canalPrincipal) {
 						try {
 							JChannel channel = new JChannel("src/main/resources/udp.xml");
-							RecebedorDeMensagens recebedorDeMensagens = new RecebedorDeMensagens(channel, usuario,
-									Interface.saida, Interface.usuarios);
-							canalPrincipal.connect(channel, usuario, recebedorDeMensagens);
-							canalPrincipal.sendNovoUsuario(usuario);
+							RecebedorDeMensagens recebedorDeMensagens = new RecebedorDeMensagens(channel,
+									usuarioConectado, Interface.saida, Interface.usuarios,
+									Interface.tabbedPaneForChats);
+							canalPrincipal.connect(channel, usuarioConectado, recebedorDeMensagens);
+							canalPrincipal.sendNovoUsuario(usuarioConectado);
 						} catch (Exception e) {
 							e.printStackTrace();
 							c1.completeExceptionally(new ErroDeConexao());
@@ -80,6 +84,12 @@ public class Chat {
 						painelDeAbertura.setVisible(false);
 						painelDeAcompanhamentoDeProgressoIndefinido.setVisible(false);
 						Interface.tabbedPaneForChats.setVisible(true);
+
+						glassPanel.repaint();
+					} else {
+						painelDeAcompanhamentoDeProgressoIndefinido.setVisible(false);
+						Interface.tabbedPaneForChats.setVisible(false);
+						painelDeAbertura.setVisible(true);
 
 						glassPanel.repaint();
 					}
@@ -103,7 +113,7 @@ public class Chat {
 									"Mensagem muito grande para ser enviada no chat. Deseja enviar a mensagem como um arquivo de texto?",
 									"Erro ao enviar mensagem", JOptionPane.YES_NO_OPTION);
 							if (n == JOptionPane.OK_CANCEL_OPTION) {
-								//TODO
+								// TODO
 							}
 						}
 					}
@@ -116,7 +126,13 @@ public class Chat {
 		});
 
 		Interface.btnIniciarChat.addActionListener((evt) -> {
-
+			try {
+				synchronized (canalPrincipal) {
+					canalPrincipal.criarNovoGrupo(Interface.usuarios.getSelectedValuesList());
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		});
 
 		frame.getContentPane().add(glassPanel);
@@ -125,7 +141,9 @@ public class Chat {
 		frame.setLocationRelativeTo(null);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) {
-				canalPrincipal.close();
+				if (canalPrincipal != null) {
+					canalPrincipal.close();
+				}
 			}
 		});
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

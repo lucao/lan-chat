@@ -1,10 +1,13 @@
 package br.com.lucasvmteixeira.chat.net;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.jgroups.JChannel;
 
 import br.com.lucasvmteixeira.chat.entity.Configuracao;
+import br.com.lucasvmteixeira.chat.entity.GrupoPrivado;
 import br.com.lucasvmteixeira.chat.entity.Mensagem;
 import br.com.lucasvmteixeira.chat.entity.Usuario;
 
@@ -42,5 +45,20 @@ public class ChannelWrapper {
 
 	public void close() {
 		this.channel.close();
+	}
+
+	public void criarNovoGrupo(List<Usuario> list) throws Exception {
+		GrupoPrivado grupo = new GrupoPrivado();
+		grupo.setUsuarios(list);
+		if (usuario.getGruposPrivados() == null) {
+			usuario.setGruposPrivados(new ArrayList<GrupoPrivado>());
+		}
+		usuario.getGruposPrivados().add(grupo);
+		
+		for (Usuario usuario: grupo.getUsuarios()) {
+			Configuracao c = new Configuracao();
+			c.setSender(usuario);
+			this.channel.send(usuario.getEnderecoConectado(), c);
+		}
 	}
 }
