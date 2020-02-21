@@ -94,4 +94,10 @@ public class Mensagem implements Serializable {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		return "Mensagem [dataDeEnvio=" + dataDeEnvio + ", identificadorDoRemetente=" + identificadorDoRemetente
+				+ ", grupo=" + grupo + ", mensagem=" + mensagem + ", lidoPor=" + lidoPor + ", sender=" + sender + "]";
+	}
 }

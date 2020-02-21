@@ -10,7 +10,7 @@ public class Configuracao implements Serializable {
 	
 	private Usuario sender;
 	private Mensagem mensagemLida;
-	
+	private GrupoPrivado grupoPrivado;
 
 	public Usuario getSender() {
 		return sender;
@@ -27,4 +27,17 @@ public class Configuracao implements Serializable {
 	public void setMensagemLida(Mensagem mensagemLida) {
 		this.mensagemLida = mensagemLida;
 	}
+	
+	public GrupoPrivado getGrupoPrivado() {
+		return grupoPrivado;
+	}
+
+	public void setGrupoPrivado(GrupoPrivado grupoPrivado) {
+		this.grupoPrivado = grupoPrivado;
+	}
+	
+	@Override
+	public String toString() {
+		return "Configuracao [sender=" + sender + ", mensagemLida=" + mensagemLida + "]";
+	}	
 }

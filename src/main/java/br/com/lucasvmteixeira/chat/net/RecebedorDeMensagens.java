@@ -40,8 +40,18 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 
 	@Override
 	public void receive(Message msg) {
-		System.out.println(msg.toString());
 		Address sender = msg.getSrc();
+		Address dest = msg.getDest();
+
+		synchronized (this.usuarios) {
+			if (this.usuarios.containsUsuarioSemIdentificacao(dest)) {
+				if (!this.usuarios.containsUsuario(dest)) {
+					this.usuarioConectado.setEnderecoConectado(dest);
+					this.usuarios.putUsuarioConectado(dest, this.usuarioConectado);
+				}
+			}
+		}
+
 		try {
 			Mensagem mensagem = (Mensagem) msg.getObject();
 			synchronized (this.usuarios) {
@@ -74,7 +84,7 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 					if (!this.usuarios.containsUsuario(sender)) {
 						configuracao.getSender().setEnderecoConectado(sender);
 						this.usuarios.putUsuarioConectado(sender, configuracao.getSender());
-						
+
 						Configuracao c = new Configuracao();
 						c.setSender(this.usuarioConectado);
 						try {
@@ -82,6 +92,14 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
+					}
+				}
+
+				if (configuracao.getGrupoPrivado() != null) {
+					
+					//TODO
+					if (!this.usuarioConectado.getGruposPrivados().contains(configuracao.getGrupoPrivado())) {
+						this.usuarios.updateGrupo(configuracao.getGrupoPrivado());
 					}
 				}
 			}
@@ -116,7 +134,7 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 				this.usuarios.removeUsuarios(exMembers);
 			}
 		}
-		// TODO atualizar mensagens
+
 		lastView = view;
 	}
 }

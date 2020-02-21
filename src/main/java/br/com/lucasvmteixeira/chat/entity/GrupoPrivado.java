@@ -12,6 +12,7 @@ public class GrupoPrivado implements Serializable {
 	
 	private String nome;
 	private Collection<Usuario> usuarios;
+	private Usuario usuarioCriador;
 	private transient List<Mensagem> mensagens;
 	
 	public String getNome() {
@@ -32,11 +33,18 @@ public class GrupoPrivado implements Serializable {
 	public void setMensagens(List<Mensagem> mensagens) {
 		this.mensagens = mensagens;
 	}
+	public Usuario getUsuarioCriador() {
+		return usuarioCriador;
+	}
+	public void setUsuarioCriador(Usuario usuarioCriador) {
+		this.usuarioCriador = usuarioCriador;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
+		result = prime * result + ((usuarioCriador == null) ? 0 : usuarioCriador.hashCode());
 		result = prime * result + ((usuarios == null) ? 0 : usuarios.hashCode());
 		return result;
 	}
@@ -53,6 +61,11 @@ public class GrupoPrivado implements Serializable {
 			if (other.nome != null)
 				return false;
 		} else if (!nome.equals(other.nome))
+			return false;
+		if (usuarioCriador == null) {
+			if (other.usuarioCriador != null)
+				return false;
+		} else if (!usuarioCriador.equals(other.usuarioCriador))
 			return false;
 		if (usuarios == null) {
 			if (other.usuarios != null)

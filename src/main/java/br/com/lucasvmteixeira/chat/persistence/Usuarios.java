@@ -10,6 +10,7 @@ import java.util.Set;
 import org.jgroups.Address;
 
 import br.com.lucasvmteixeira.chat.Atualizavel;
+import br.com.lucasvmteixeira.chat.entity.GrupoPrivado;
 import br.com.lucasvmteixeira.chat.entity.Usuario;
 
 public class Usuarios {
@@ -53,6 +54,26 @@ public class Usuarios {
 		this.usuariosConectados.keySet().removeAll(members);
 		for (Atualizavel o : this.observables) {
 			o.atualizar(this.usuariosConectados.values());
+		}
+	}
+
+	public void updateGrupo(GrupoPrivado grupo) {
+		boolean houveAlteracao = false;
+		for (Usuario usuario : this.usuariosConectados.values()) {
+			if (usuario.getGruposPrivados() == null) {
+				usuario.setGruposPrivados(new HashSet<GrupoPrivado>());
+			}
+			if (grupo.getUsuarios().contains(usuario)) {
+				if (!usuario.getGruposPrivados().add(grupo)) {
+					houveAlteracao = true;
+				}
+			}
+		}
+
+		if (houveAlteracao) {
+			for (Atualizavel o : this.observables) {
+				o.atualizar(this.usuariosConectados.values());
+			}
 		}
 	}
 }

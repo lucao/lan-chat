@@ -1,8 +1,8 @@
 package br.com.lucasvmteixeira.chat.entity;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.jgroups.Address;
 
@@ -15,7 +15,7 @@ public class Usuario implements Serializable {
 	public static final String canalPrincipal = "channel";
 	
 	private String nome;
-	private Collection<GrupoPrivado> gruposPrivados;
+	private Set<GrupoPrivado> gruposPrivados;
 	private transient List<Mensagem> conversas;
 	
 	private transient Address enderecoConectado;
@@ -26,10 +26,10 @@ public class Usuario implements Serializable {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-	public Collection<GrupoPrivado> getGruposPrivados() {
+	public Set<GrupoPrivado> getGruposPrivados() {
 		return gruposPrivados;
 	}
-	public void setGruposPrivados(Collection<GrupoPrivado> gruposPrivados) {
+	public void setGruposPrivados(Set<GrupoPrivado> gruposPrivados) {
 		this.gruposPrivados = gruposPrivados;
 	}
 	public List<Mensagem> getConversas() {
@@ -43,5 +43,28 @@ public class Usuario implements Serializable {
 	}
 	public void setEnderecoConectado(Address enderecoConectado) {
 		this.enderecoConectado = enderecoConectado;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Usuario other = (Usuario) obj;
+		if (nome == null) {
+			if (other.nome != null)
+				return false;
+		} else if (!nome.equals(other.nome))
+			return false;
+		return true;
 	}
 }

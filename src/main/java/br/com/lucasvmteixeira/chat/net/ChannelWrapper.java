@@ -1,11 +1,13 @@
 package br.com.lucasvmteixeira.chat.net;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import org.jgroups.JChannel;
 
+import br.com.lucasvmteixeira.chat.GrupoJaExisteParaOUsuarioEmQuestao;
+import br.com.lucasvmteixeira.chat.GrupoVazio;
 import br.com.lucasvmteixeira.chat.entity.Configuracao;
 import br.com.lucasvmteixeira.chat.entity.GrupoPrivado;
 import br.com.lucasvmteixeira.chat.entity.Mensagem;
@@ -21,6 +23,7 @@ public class ChannelWrapper {
 		this.channel.setReceiver(recebedorDeMensagens);
 		this.channel.setName(usuario.getNome());
 		this.channel.connect(Usuario.canalPrincipal);
+		channel.getState(null, 0);
 		this.usuario = usuario;
 		return this;
 	}
@@ -30,35 +33,53 @@ public class ChannelWrapper {
 		m.setDataDeEnvio(new Date());
 		m.setSender(this.usuario);
 		m.setMensagem(mensagem);
-		
-		//TODO controle assíncrono de envio
+
+		// TODO controle assíncrono de envio
 		this.channel.send(null, m);
 	}
 
 	public void sendNovoUsuario(Usuario usuario) throws Exception {
 		Configuracao c = new Configuracao();
 		c.setSender(usuario);
-		
-		//TODO controle assíncrono de envio
+
 		this.channel.send(null, c);
 	}
 
 	public void close() {
-		this.channel.close();
+		if (this.channel != null) {
+			this.channel.close();
+		}
 	}
 
-	public void criarNovoGrupo(List<Usuario> list) throws Exception {
+	public void criarNovoGrupo(Usuario usuarioCriador, String nome, List<Usuario> list) throws Exception {
 		GrupoPrivado grupo = new GrupoPrivado();
-		grupo.setUsuarios(list);
-		if (usuario.getGruposPrivados() == null) {
-			usuario.setGruposPrivados(new ArrayList<GrupoPrivado>());
+		grupo.setNome(nome);
+		grupo.setUsuarioCriador(usuarioCriador);
+		if (list != null) {
+			grupo.setUsuarios(list);
+			grupo.getUsuarios().add(usuario);
+		} else {
+			throw new GrupoVazio();
 		}
-		usuario.getGruposPrivados().add(grupo);
-		
-		for (Usuario usuario: grupo.getUsuarios()) {
-			Configuracao c = new Configuracao();
-			c.setSender(usuario);
+
+		if (usuario.getGruposPrivados() == null) {
+			usuario.setGruposPrivados(new HashSet<GrupoPrivado>());
+		}
+		if (!usuario.getGruposPrivados().add(grupo)) {
+			throw new GrupoJaExisteParaOUsuarioEmQuestao();
+		}
+		Configuracao c = new Configuracao();
+		c.setSender(usuarioCriador);
+		c.setGrupoPrivado(grupo);
+		for (Usuario usuario : grupo.getUsuarios()) {
 			this.channel.send(usuario.getEnderecoConectado(), c);
 		}
+	}
+
+	public void atualizar() throws Exception {
+		Configuracao c = new Configuracao();
+		c.setSender(usuario);
+
+		this.channel.send(null, c);
 	}
 }

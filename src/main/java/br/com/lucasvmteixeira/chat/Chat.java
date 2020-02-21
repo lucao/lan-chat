@@ -2,6 +2,7 @@ package br.com.lucasvmteixeira.chat;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import javax.swing.JFrame;
@@ -127,9 +128,25 @@ public class Chat {
 
 		Interface.btnIniciarChat.addActionListener((evt) -> {
 			try {
-				synchronized (canalPrincipal) {
-					canalPrincipal.criarNovoGrupo(Interface.usuarios.getSelectedValuesList());
+				String nomeDoGrupo = JOptionPane.showInputDialog("Digite um nome para a conversa");
+				List<Usuario> usuarios = Interface.usuarios.getSelectedValuesList();
+				if (usuarios != null) {
+					if (!usuarios.isEmpty()) {
+						synchronized (canalPrincipal) {
+							canalPrincipal.criarNovoGrupo(usuarioConectado, nomeDoGrupo, usuarios);
+						}
+					}
 				}
+			} catch (GrupoJaExisteParaOUsuarioEmQuestao e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+
+		Interface.btnAtualizar.addActionListener((evt) -> {
+			try {
+				canalPrincipal.atualizar();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -137,7 +154,7 @@ public class Chat {
 
 		frame.getContentPane().add(glassPanel);
 		frame.pack();
-		frame.setSize(800, 600);
+		frame.setSize(1000, 800);
 		frame.setLocationRelativeTo(null);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) {
