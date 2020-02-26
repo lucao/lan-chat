@@ -11,6 +11,7 @@ public class Configuracao implements Serializable {
 	private Usuario sender;
 	private Mensagem mensagemLida;
 	private GrupoPrivado grupoPrivado;
+	private boolean pedidoDeAtualizacao;
 
 	public Usuario getSender() {
 		return sender;
@@ -39,5 +40,13 @@ public class Configuracao implements Serializable {
 	@Override
 	public String toString() {
 		return "Configuracao [sender=" + sender + ", mensagemLida=" + mensagemLida + "]";
+	}
+
+	public boolean isPedidoDeAtualizacao() {
+		return pedidoDeAtualizacao;
+	}
+
+	public void setPedidoDeAtualizacao(boolean pedidoDeAtualizacao) {
+		this.pedidoDeAtualizacao = pedidoDeAtualizacao;
 	}	
 }

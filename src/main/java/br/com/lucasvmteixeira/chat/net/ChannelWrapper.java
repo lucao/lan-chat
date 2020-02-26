@@ -3,6 +3,7 @@ package br.com.lucasvmteixeira.chat.net;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jgroups.JChannel;
 
@@ -51,7 +52,7 @@ public class ChannelWrapper {
 		}
 	}
 
-	public void criarNovoGrupo(Usuario usuarioCriador, String nome, List<Usuario> list) throws Exception {
+	public void criarNovoGrupo(Usuario usuarioCriador, String nome, Set<Usuario> list) throws Exception {
 		GrupoPrivado grupo = new GrupoPrivado();
 		grupo.setNome(nome);
 		grupo.setUsuarioCriador(usuarioCriador);
@@ -62,12 +63,6 @@ public class ChannelWrapper {
 			throw new GrupoVazio();
 		}
 
-		if (usuario.getGruposPrivados() == null) {
-			usuario.setGruposPrivados(new HashSet<GrupoPrivado>());
-		}
-		if (!usuario.getGruposPrivados().add(grupo)) {
-			throw new GrupoJaExisteParaOUsuarioEmQuestao();
-		}
 		Configuracao c = new Configuracao();
 		c.setSender(usuarioCriador);
 		c.setGrupoPrivado(grupo);
@@ -79,6 +74,7 @@ public class ChannelWrapper {
 	public void atualizar() throws Exception {
 		Configuracao c = new Configuracao();
 		c.setSender(usuario);
+		c.setPedidoDeAtualizacao(true);
 
 		this.channel.send(null, c);
 	}

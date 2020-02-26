@@ -80,6 +80,9 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 		} catch (ClassCastException e) {
 			Configuracao configuracao = (Configuracao) msg.getObject();
 			synchronized (this.usuarios) {
+				if (configuracao.isPedidoDeAtualizacao()) {
+					this.viewAccepted(channel.getView());
+				}
 				if (this.usuarios.containsUsuarioSemIdentificacao(sender)) {
 					if (!this.usuarios.containsUsuario(sender)) {
 						configuracao.getSender().setEnderecoConectado(sender);
@@ -96,11 +99,8 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 				}
 
 				if (configuracao.getGrupoPrivado() != null) {
-					
-					//TODO
-					if (!this.usuarioConectado.getGruposPrivados().contains(configuracao.getGrupoPrivado())) {
-						this.usuarios.updateGrupo(configuracao.getGrupoPrivado());
-					}
+					this.usuarios.updateGrupoDoUsuario(usuarioConectado.getEnderecoConectado(),
+							configuracao.getGrupoPrivado());
 				}
 			}
 

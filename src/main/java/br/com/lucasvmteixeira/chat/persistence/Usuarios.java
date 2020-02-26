@@ -57,22 +57,17 @@ public class Usuarios {
 		}
 	}
 
-	public void updateGrupo(GrupoPrivado grupo) {
-		boolean houveAlteracao = false;
-		for (Usuario usuario : this.usuariosConectados.values()) {
-			if (usuario.getGruposPrivados() == null) {
-				usuario.setGruposPrivados(new HashSet<GrupoPrivado>());
-			}
-			if (grupo.getUsuarios().contains(usuario)) {
-				if (!usuario.getGruposPrivados().add(grupo)) {
-					houveAlteracao = true;
-				}
-			}
-		}
+	public void updateGrupoDoUsuario(Address member, GrupoPrivado grupo) {
+		Usuario usuario = this.usuariosConectados.get(member);
 
-		if (houveAlteracao) {
-			for (Atualizavel o : this.observables) {
-				o.atualizar(this.usuariosConectados.values());
+		if (usuario.getGruposPrivados() == null) {
+			usuario.setGruposPrivados(new HashSet<GrupoPrivado>());
+		}
+		if (grupo.getUsuarios().contains(usuario)) {
+			if (usuario.getGruposPrivados().add(grupo)) {
+				for (Atualizavel o : this.observables) {
+					o.atualizar(usuario);
+				}
 			}
 		}
 	}

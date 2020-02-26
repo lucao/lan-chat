@@ -2,7 +2,9 @@ package br.com.lucasvmteixeira.chat;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import javax.swing.JFrame;
@@ -129,7 +131,7 @@ public class Chat {
 		Interface.btnIniciarChat.addActionListener((evt) -> {
 			try {
 				String nomeDoGrupo = JOptionPane.showInputDialog("Digite um nome para a conversa");
-				List<Usuario> usuarios = Interface.usuarios.getSelectedValuesList();
+				Set<Usuario> usuarios = new HashSet<Usuario>(Interface.usuarios.getSelectedValuesList());
 				if (usuarios != null) {
 					if (!usuarios.isEmpty()) {
 						synchronized (canalPrincipal) {

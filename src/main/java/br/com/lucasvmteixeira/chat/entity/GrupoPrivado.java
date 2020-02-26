@@ -3,6 +3,7 @@ package br.com.lucasvmteixeira.chat.entity;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class GrupoPrivado implements Serializable {
 	/**
@@ -11,7 +12,7 @@ public class GrupoPrivado implements Serializable {
 	private static final long serialVersionUID = -3898530148223626334L;
 	
 	private String nome;
-	private Collection<Usuario> usuarios;
+	private Set<Usuario> usuarios;
 	private Usuario usuarioCriador;
 	private transient List<Mensagem> mensagens;
 	
@@ -21,10 +22,10 @@ public class GrupoPrivado implements Serializable {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-	public Collection<Usuario> getUsuarios() {
+	public Set<Usuario> getUsuarios() {
 		return usuarios;
 	}
-	public void setUsuarios(Collection<Usuario> usuarios) {
+	public void setUsuarios(Set<Usuario> usuarios) {
 		this.usuarios = usuarios;
 	}
 	public List<Mensagem> getMensagens() {

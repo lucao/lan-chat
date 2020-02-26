@@ -42,100 +42,93 @@ public class JTabbedPaneObservable extends JTabbedPane implements Atualizavel {
 	@Override
 	public synchronized void atualizar(Object o) {
 		try {
-			@SuppressWarnings("unchecked")
-			Collection<Usuario> usuarios = (Collection<Usuario>) o;
+			Usuario usuario = (Usuario) o;
 
-			for (Usuario usuario : usuarios) {
-				if (usuario.getGruposPrivados() != null) {
-					for (GrupoPrivado grupoNaoCriado : usuario.getGruposPrivados().stream()
-							.filter(Predicate.not(tabsIdentifiers::contains)).collect(Collectors.toList())) {
-						JPanel panel = new JPanel();
+			if (usuario.getGruposPrivados() != null) {
+				for (GrupoPrivado grupoNaoCriado : usuario.getGruposPrivados().stream()
+						.filter(Predicate.not(tabsIdentifiers::contains)).collect(Collectors.toList())) {
+					tabsIdentifiers.add(grupoNaoCriado);
 
-						JScrollPane jScrollPane1 = new JScrollPane();
+					JPanel panel = new JPanel();
 
-						JButton btnEnviarPrivado = new JButton();
-						btnEnviarPrivado.setText("Enviar");
-						mapaBtnEnviarPrivado.put(grupoNaoCriado, btnEnviarPrivado);
+					JScrollPane jScrollPane1 = new JScrollPane();
 
-						JMenuItem btnEnviarImgPrivado = new JMenuItem();
-						JMenuItem btnEnviarVidPrivado = new JMenuItem();
-						JMenuItem btnEnviarFilePrivado = new JMenuItem();
-						btnEnviarImgPrivado.setText("Imagem");
-						btnEnviarVidPrivado.setText("Vídeo");
-						btnEnviarFilePrivado.setText("Arquivo");
-						mapaBtnEnviarImgPrivado.put(grupoNaoCriado, btnEnviarImgPrivado);
-						mapaBbtnEnviarVidPrivado.put(grupoNaoCriado, btnEnviarVidPrivado);
-						mapaBtnEnviarFilePrivado.put(grupoNaoCriado, btnEnviarFilePrivado);
+					JButton btnEnviarPrivado = new JButton();
+					btnEnviarPrivado.setText("Enviar");
+					mapaBtnEnviarPrivado.put(grupoNaoCriado, btnEnviarPrivado);
 
-						final JButton btnEnviarComplexo = new JButton("...");
-						final JPopupMenu menuEnviarComplexo = new JPopupMenu();
-						menuEnviarComplexo.add(btnEnviarImgPrivado);
-						menuEnviarComplexo.add(btnEnviarVidPrivado);
-						menuEnviarComplexo.add(btnEnviarFilePrivado);
-						btnEnviarComplexo.addMouseListener(new MouseAdapter() {
-							public void mousePressed(MouseEvent e) {
-								menuEnviarComplexo.show(e.getComponent(), e.getX(), e.getY());
-							}
-						});
+					JMenuItem btnEnviarImgPrivado = new JMenuItem();
+					JMenuItem btnEnviarVidPrivado = new JMenuItem();
+					JMenuItem btnEnviarFilePrivado = new JMenuItem();
+					btnEnviarImgPrivado.setText("Imagem");
+					btnEnviarVidPrivado.setText("Vídeo");
+					btnEnviarFilePrivado.setText("Arquivo");
+					mapaBtnEnviarImgPrivado.put(grupoNaoCriado, btnEnviarImgPrivado);
+					mapaBbtnEnviarVidPrivado.put(grupoNaoCriado, btnEnviarVidPrivado);
+					mapaBtnEnviarFilePrivado.put(grupoNaoCriado, btnEnviarFilePrivado);
 
-						jScrollPane1.setHorizontalScrollBarPolicy(
-								javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-						jScrollPane1
-								.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-						jScrollPane1.setAutoscrolls(true);
+					final JButton btnEnviarComplexo = new JButton("...");
+					final JPopupMenu menuEnviarComplexo = new JPopupMenu();
+					menuEnviarComplexo.add(btnEnviarImgPrivado);
+					menuEnviarComplexo.add(btnEnviarVidPrivado);
+					menuEnviarComplexo.add(btnEnviarFilePrivado);
+					btnEnviarComplexo.addMouseListener(new MouseAdapter() {
+						public void mousePressed(MouseEvent e) {
+							menuEnviarComplexo.show(e.getComponent(), e.getX(), e.getY());
+						}
+					});
 
-						JTextAreaObservable saidaPrivado = new JTextAreaObservable();
-						saidaPrivado.setColumns(20);
-						saidaPrivado.setLineWrap(true);
-						saidaPrivado.setRows(5);
-						jScrollPane1.setViewportView(saidaPrivado);
-						mapaSaidaPrivado.put(grupoNaoCriado, saidaPrivado);
+					jScrollPane1
+							.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+					jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+					jScrollPane1.setAutoscrolls(true);
 
-						JTextField entradaPrivado = new JTextField();
-						mapaEntradaPrivado.put(grupoNaoCriado, entradaPrivado);
+					JTextAreaObservable saidaPrivado = new JTextAreaObservable();
+					saidaPrivado.setColumns(20);
+					saidaPrivado.setLineWrap(true);
+					saidaPrivado.setRows(5);
+					jScrollPane1.setViewportView(saidaPrivado);
+					mapaSaidaPrivado.put(grupoNaoCriado, saidaPrivado);
 
-						GroupLayout layout = new GroupLayout(panel);
-						panel.setLayout(layout);
-						layout.setHorizontalGroup(
-								layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(layout
-										.createSequentialGroup().addContainerGap().addGroup(layout
-												.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-												.addComponent(
-														jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400,
-														Short.MAX_VALUE)
-												.addGroup(layout.createSequentialGroup().addComponent(entradaPrivado,
-														javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
-														.addPreferredGap(
-																javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-														.addComponent(btnEnviarPrivado,
-																javax.swing.GroupLayout.DEFAULT_SIZE, 50,
-																Short.MAX_VALUE)
-														.addPreferredGap(
-																javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-														.addComponent(btnEnviarComplexo,
-																javax.swing.GroupLayout.DEFAULT_SIZE, 50,
-																Short.MAX_VALUE)))
+					JTextField entradaPrivado = new JTextField();
+					mapaEntradaPrivado.put(grupoNaoCriado, entradaPrivado);
 
-										.addContainerGap()));
-						layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-								.addGroup(layout.createSequentialGroup().addContainerGap()
-										.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 350,
-												Short.MAX_VALUE)
-										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(btnEnviarPrivado, javax.swing.GroupLayout.PREFERRED_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.PREFERRED_SIZE)
-												.addComponent(entradaPrivado, javax.swing.GroupLayout.PREFERRED_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.PREFERRED_SIZE)
-												.addComponent(btnEnviarComplexo, javax.swing.GroupLayout.PREFERRED_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addContainerGap()));
+					GroupLayout layout = new GroupLayout(panel);
+					panel.setLayout(layout);
+					layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+							.addGroup(layout.createSequentialGroup().addContainerGap()
+									.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+											.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400,
+													Short.MAX_VALUE)
+											.addGroup(layout.createSequentialGroup()
+													.addComponent(entradaPrivado, javax.swing.GroupLayout.DEFAULT_SIZE,
+															311, Short.MAX_VALUE)
+													.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+													.addComponent(btnEnviarPrivado,
+															javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
+													.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+													.addComponent(btnEnviarComplexo,
+															javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)))
 
-						this.add(grupoNaoCriado.getNome(), panel);
-					}
+									.addContainerGap()));
+					layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+							.addGroup(layout.createSequentialGroup().addContainerGap()
+									.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 350,
+											Short.MAX_VALUE)
+									.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+									.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+											.addComponent(btnEnviarPrivado, javax.swing.GroupLayout.PREFERRED_SIZE,
+													javax.swing.GroupLayout.DEFAULT_SIZE,
+													javax.swing.GroupLayout.PREFERRED_SIZE)
+											.addComponent(entradaPrivado, javax.swing.GroupLayout.PREFERRED_SIZE,
+													javax.swing.GroupLayout.DEFAULT_SIZE,
+													javax.swing.GroupLayout.PREFERRED_SIZE)
+											.addComponent(btnEnviarComplexo, javax.swing.GroupLayout.PREFERRED_SIZE,
+													javax.swing.GroupLayout.DEFAULT_SIZE,
+													javax.swing.GroupLayout.PREFERRED_SIZE))
+									.addContainerGap()));
+
+					this.add(grupoNaoCriado.getNome(), panel);
 				}
 			}
 		} catch (ClassCastException e) {
