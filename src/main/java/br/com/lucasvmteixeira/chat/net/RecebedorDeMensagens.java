@@ -31,7 +31,6 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 		this.mensagens = new Mensagens();
 		this.channel = channel;
 		this.usuarioConectado = usuarioConectado;
-		this.usuarioConectado.setEnderecoConectado(channel.address());
 
 		for (Atualizavel o : observers) {
 			this.mensagens.addObserver(o);
@@ -59,8 +58,7 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 			}
 
 			if (mensagem.getGrupo() != null) {
-				this.usuarios.updateGrupoDoUsuario(usuarioConectado.getEnderecoConectado(),
-						mensagem.getGrupo());
+				this.usuarios.updateGrupoDoUsuario(usuarioConectado.getEnderecoConectado(), mensagem.getGrupo());
 			}
 
 		} catch (ClassCastException e) {
@@ -111,6 +109,13 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 		if (lastView == null) {
 			synchronized (this.usuarios) {
 				this.usuarios.addUsuariosSemIdentificacao(view.getMembers());
+				
+				this.usuarioConectado.setEnderecoConectado(this.channel.getAddress());
+				if (this.usuarios.containsUsuarioSemIdentificacao(this.channel.getAddress())) {
+					if (!this.usuarios.containsUsuario(this.channel.getAddress())) {
+						this.usuarios.putUsuarioConectado(this.channel.getAddress(), this.usuarioConectado);
+					}
+				}
 			}
 		} else {
 			List<Address> newMembers = View.newMembers(lastView, view);
