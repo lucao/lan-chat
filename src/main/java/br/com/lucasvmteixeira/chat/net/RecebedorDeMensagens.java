@@ -31,6 +31,7 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 		this.mensagens = new Mensagens();
 		this.channel = channel;
 		this.usuarioConectado = usuarioConectado;
+		this.usuarioConectado.setEnderecoConectado(channel.address());
 
 		for (Atualizavel o : observers) {
 			this.mensagens.addObserver(o);
@@ -41,16 +42,6 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 	@Override
 	public void receive(Message msg) {
 		Address sender = msg.getSrc();
-		Address dest = msg.getDest();
-
-		synchronized (this.usuarios) {
-			if (this.usuarios.containsUsuarioSemIdentificacao(dest)) {
-				if (!this.usuarios.containsUsuario(dest)) {
-					this.usuarioConectado.setEnderecoConectado(dest);
-					this.usuarios.putUsuarioConectado(dest, this.usuarioConectado);
-				}
-			}
-		}
 
 		try {
 			Mensagem mensagem = (Mensagem) msg.getObject();
@@ -67,14 +58,9 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 				mensagens.ler(mensagem, mensagem.getSender());
 			}
 
-			Configuracao configuracao = new Configuracao();
-			configuracao.setSender(this.usuarioConectado);
-			configuracao.setMensagemLida(mensagem);
-
-			try {
-				channel.send(null, configuracao);
-			} catch (Exception e) {
-				e.printStackTrace();
+			if (mensagem.getGrupo() != null) {
+				this.usuarios.updateGrupoDoUsuario(usuarioConectado.getEnderecoConectado(),
+						mensagem.getGrupo());
 			}
 
 		} catch (ClassCastException e) {
