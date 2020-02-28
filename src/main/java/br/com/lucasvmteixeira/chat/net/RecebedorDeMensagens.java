@@ -11,6 +11,7 @@ import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
 
 import br.com.lucasvmteixeira.chat.Atualizavel;
+import br.com.lucasvmteixeira.chat.UsuarioNaoConectado;
 import br.com.lucasvmteixeira.chat.entity.Configuracao;
 import br.com.lucasvmteixeira.chat.entity.Mensagem;
 import br.com.lucasvmteixeira.chat.entity.Usuario;
@@ -44,10 +45,11 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 
 		try {
 			Mensagem mensagem = (Mensagem) msg.getObject();
+			
+			mensagem.getSender().setEnderecoConectado(sender);
 			synchronized (this.usuarios) {
 				if (this.usuarios.containsUsuarioSemIdentificacao(sender)) {
 					if (!this.usuarios.containsUsuario(sender)) {
-						mensagem.getSender().setEnderecoConectado(sender);
 						this.usuarios.putUsuarioConectado(sender, mensagem.getSender());
 					}
 				}
@@ -58,18 +60,23 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 			}
 
 			if (mensagem.getGrupo() != null) {
-				this.usuarios.updateGrupoDoUsuario(usuarioConectado.getEnderecoConectado(), mensagem.getGrupo());
+				try {
+					this.usuarios.updateGrupoDoUsuario(usuarioConectado.getEnderecoConectado(), mensagem.getGrupo());
+				} catch (UsuarioNaoConectado e) {
+					e.printStackTrace();
+				}
 			}
 
 		} catch (ClassCastException e) {
 			Configuracao configuracao = (Configuracao) msg.getObject();
+			
+			configuracao.getSender().setEnderecoConectado(sender);
 			synchronized (this.usuarios) {
 				if (configuracao.isPedidoDeAtualizacao()) {
 					this.viewAccepted(channel.getView());
 				}
 				if (this.usuarios.containsUsuarioSemIdentificacao(sender)) {
 					if (!this.usuarios.containsUsuario(sender)) {
-						configuracao.getSender().setEnderecoConectado(sender);
 						this.usuarios.putUsuarioConectado(sender, configuracao.getSender());
 
 						Configuracao c = new Configuracao();
@@ -83,8 +90,12 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 				}
 
 				if (configuracao.getGrupoPrivado() != null) {
-					this.usuarios.updateGrupoDoUsuario(usuarioConectado.getEnderecoConectado(),
-							configuracao.getGrupoPrivado());
+					try {
+						this.usuarios.updateGrupoDoUsuario(usuarioConectado.getEnderecoConectado(),
+								configuracao.getGrupoPrivado());
+					} catch (UsuarioNaoConectado e1) {
+						e1.printStackTrace();
+					}
 				}
 			}
 
@@ -109,10 +120,9 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 		if (lastView == null) {
 			synchronized (this.usuarios) {
 				this.usuarios.addUsuariosSemIdentificacao(view.getMembers());
-				
-				this.usuarioConectado.setEnderecoConectado(this.channel.getAddress());
 				if (this.usuarios.containsUsuarioSemIdentificacao(this.channel.getAddress())) {
 					if (!this.usuarios.containsUsuario(this.channel.getAddress())) {
+						this.usuarioConectado.setEnderecoConectado(this.channel.getAddress());
 						this.usuarios.putUsuarioConectado(this.channel.getAddress(), this.usuarioConectado);
 					}
 				}

@@ -1,13 +1,13 @@
 package br.com.lucasvmteixeira.chat.net;
 
+import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jgroups.JChannel;
 
-import br.com.lucasvmteixeira.chat.GrupoJaExisteParaOUsuarioEmQuestao;
 import br.com.lucasvmteixeira.chat.GrupoVazio;
 import br.com.lucasvmteixeira.chat.entity.Configuracao;
 import br.com.lucasvmteixeira.chat.entity.GrupoPrivado;
@@ -38,6 +38,19 @@ public class ChannelWrapper {
 		// TODO controle assíncrono de envio
 		this.channel.send(null, m);
 	}
+	
+	public void send(String mensagem, GrupoPrivado grupo) throws Exception {
+		Mensagem m = new Mensagem();
+		m.setDataDeEnvio(new Date());
+		m.setSender(this.usuario);
+		m.setMensagem(mensagem);
+		m.setGrupo(grupo);
+
+		// TODO controle assíncrono de envio
+		for (Usuario usuario: grupo.getUsuarios()) {
+			this.channel.send(usuario.getEnderecoConectado(), m);
+		}
+	}
 
 	public void sendNovoUsuario(Usuario usuario) throws Exception {
 		Configuracao c = new Configuracao();
@@ -52,12 +65,12 @@ public class ChannelWrapper {
 		}
 	}
 
-	public void criarNovoGrupo(Usuario usuarioCriador, String nome, Set<Usuario> list) throws Exception {
+	public void criarNovoGrupo(Usuario usuarioCriador, String nome, Collection<Usuario> usuarios) throws Exception {
 		GrupoPrivado grupo = new GrupoPrivado();
 		grupo.setNome(nome);
 		grupo.setUsuarioCriador(usuarioCriador);
-		if (list != null) {
-			grupo.setUsuarios(list);
+		if (usuarios != null) {
+			grupo.setUsuarios(usuarios.stream().collect(Collectors.toSet()));
 			grupo.getUsuarios().add(usuario);
 		} else {
 			throw new GrupoVazio();
@@ -77,5 +90,9 @@ public class ChannelWrapper {
 		c.setPedidoDeAtualizacao(true);
 
 		this.channel.send(null, c);
+	}
+
+	public boolean isConnected() {
+		return channel.isConnected();
 	}
 }

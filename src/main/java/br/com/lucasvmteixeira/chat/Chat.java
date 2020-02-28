@@ -2,6 +2,7 @@ package br.com.lucasvmteixeira.chat;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +20,17 @@ import br.com.lucasvmteixeira.chat.net.RecebedorDeMensagens;
 
 public class Chat {
 	private static final ChannelWrapper canalPrincipal = new ChannelWrapper();
+	
+	/**
+	 * 
+	 * @return o canal principal da aplicação, se o canal não estiver conectado, retorna null;
+	 */
+	public static synchronized final ChannelWrapper getMainChannel() {
+		if (canalPrincipal.isConnected()) {
+			return canalPrincipal;
+		}
+		return null;
+	}
 
 	public static void main(String[] args) {
 		JFrame frame = new JFrame();
@@ -131,7 +143,7 @@ public class Chat {
 		Interface.btnIniciarChat.addActionListener((evt) -> {
 			try {
 				String nomeDoGrupo = JOptionPane.showInputDialog("Digite um nome para a conversa");
-				Set<Usuario> usuarios = new HashSet<Usuario>(Interface.usuarios.getSelectedValuesList());
+				Collection<Usuario> usuarios = Interface.usuarios.getUsuarios();
 				if (usuarios != null) {
 					if (!usuarios.isEmpty()) {
 						synchronized (canalPrincipal) {

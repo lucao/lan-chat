@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jgroups.Address;
 
@@ -15,6 +16,7 @@ import br.com.lucasvmteixeira.chat.entity.Usuario;
 
 public class Usuarios {
 	private Map<Address, Usuario> usuariosConectados;
+	private Map<Usuario, Address> enderecosDeUsuarios;
 	private Set<Address> usuariosConectadosSemIdentificacao;
 
 	private List<Atualizavel> observables;
@@ -22,6 +24,7 @@ public class Usuarios {
 	public Usuarios() {
 		this.observables = new ArrayList<Atualizavel>();
 		this.usuariosConectados = new HashMap<Address, Usuario>();
+		this.enderecosDeUsuarios = new HashMap<Usuario, Address>();
 		this.usuariosConectadosSemIdentificacao = new HashSet<Address>();
 	}
 
@@ -30,7 +33,10 @@ public class Usuarios {
 	}
 
 	public void putUsuarioConectado(Address sender, Usuario usuarioSender) {
+		usuarioSender.setEnderecoConectado(sender);
+
 		this.usuariosConectados.put(sender, usuarioSender);
+		this.enderecosDeUsuarios.put(usuarioSender, sender);
 		this.usuariosConectadosSemIdentificacao.remove(sender);
 		for (Atualizavel o : this.observables) {
 			o.atualizar(this.usuariosConectados.values());
@@ -50,8 +56,13 @@ public class Usuarios {
 	}
 
 	public void removeUsuarios(List<Address> members) {
-		this.usuariosConectadosSemIdentificacao.removeAll(members);
-		this.usuariosConectados.keySet().removeAll(members);
+		for (Address member : members) {
+			this.enderecosDeUsuarios.remove(this.usuariosConectados.get(member));
+			this.usuariosConectados.remove(member);
+
+			this.usuariosConectadosSemIdentificacao.remove(member);
+		}
+
 		for (Atualizavel o : this.observables) {
 			o.atualizar(this.usuariosConectados.values());
 		}
@@ -63,12 +74,18 @@ public class Usuarios {
 		if (usuario.getGruposPrivados() == null) {
 			usuario.setGruposPrivados(new HashSet<GrupoPrivado>());
 		}
-		if (grupo.getUsuarios().contains(usuario)) {
+		Set<Usuario> usuariosDoGrupo = usuariosConectados.values().stream()
+				.filter(u -> this.usuariosConectados.values().contains(u)).collect(Collectors.toSet());
+		if (usuariosDoGrupo.contains(usuario)) {
 			if (usuario.getGruposPrivados().add(grupo)) {
 				for (Atualizavel o : this.observables) {
 					o.atualizar(usuario);
 				}
 			}
 		}
+	}
+
+	public Address getEnderecoConectado(Usuario usuario) {
+		return enderecosDeUsuarios.get(usuario);
 	}
 }

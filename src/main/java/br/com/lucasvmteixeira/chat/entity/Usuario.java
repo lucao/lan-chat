@@ -6,6 +6,9 @@ import java.util.Set;
 
 import org.jgroups.Address;
 
+import br.com.lucasvmteixeira.chat.UsuarioNaoConectado;
+import br.com.lucasvmteixeira.chat.persistence.Usuarios;
+
 public class Usuario implements Serializable {
 	/**
 	 * 
@@ -13,37 +16,48 @@ public class Usuario implements Serializable {
 	private static final long serialVersionUID = 6747522460337961540L;
 
 	public static final String canalPrincipal = "channel";
-	
+
 	private String nome;
 	private Set<GrupoPrivado> gruposPrivados;
 	private transient List<Mensagem> conversas;
-	
+
 	private transient Address enderecoConectado;
-	
+
 	public String getNome() {
 		return nome;
 	}
+
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
+
 	public Set<GrupoPrivado> getGruposPrivados() {
 		return gruposPrivados;
 	}
+
 	public void setGruposPrivados(Set<GrupoPrivado> gruposPrivados) {
 		this.gruposPrivados = gruposPrivados;
 	}
+
 	public List<Mensagem> getConversas() {
 		return conversas;
 	}
+
 	public void setConversas(List<Mensagem> conversas) {
 		this.conversas = conversas;
 	}
-	public Address getEnderecoConectado() {
+
+	public Address getEnderecoConectado() throws UsuarioNaoConectado {
+		if (enderecoConectado == null) {
+			throw new UsuarioNaoConectado();
+		}
 		return enderecoConectado;
 	}
+
 	public void setEnderecoConectado(Address enderecoConectado) {
 		this.enderecoConectado = enderecoConectado;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -51,6 +65,7 @@ public class Usuario implements Serializable {
 		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
