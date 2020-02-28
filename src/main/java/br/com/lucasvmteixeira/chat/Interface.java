@@ -3,6 +3,7 @@ package br.com.lucasvmteixeira.chat;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.Action;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -13,6 +14,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 
 import br.com.lucasvmteixeira.chat.components.JListObservable;
@@ -20,6 +22,8 @@ import br.com.lucasvmteixeira.chat.components.JTabbedPaneObservable;
 import br.com.lucasvmteixeira.chat.components.JTextAreaObservable;
 
 public class Interface {
+	public static final JToolBar toolbar = new JToolBar();  
+	
 	public static final JTabbedPaneObservable tabbedPaneForChats = new JTabbedPaneObservable();
 
 	public static final JButton btnEnviar = new JButton();
@@ -36,6 +40,8 @@ public class Interface {
 	public static final JButton btnIniciarChat = new JButton();
 
 	public static final JListObservable usuarios = new JListObservable();
+
+	public static final JButton helpButton = new JButton("Ajuda");
 
 	public static void destruirPainelDeChatPrivado(Object identificador) {
 		// TODO
@@ -104,7 +110,7 @@ public class Interface {
 						.addComponent(btnEnviarComplexo, javax.swing.GroupLayout.PREFERRED_SIZE,
 								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
 				.addContainerGap()));
-
+		
 		return panel;
 	}
 

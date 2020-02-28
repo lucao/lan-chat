@@ -1,5 +1,6 @@
 package br.com.lucasvmteixeira.chat;
 
+import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Collection;
@@ -9,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -20,10 +22,11 @@ import br.com.lucasvmteixeira.chat.net.RecebedorDeMensagens;
 
 public class Chat {
 	private static final ChannelWrapper canalPrincipal = new ChannelWrapper();
-	
+
 	/**
 	 * 
-	 * @return o canal principal da aplicação, se o canal não estiver conectado, retorna null;
+	 * @return o canal principal da aplicação, se o canal não estiver conectado,
+	 *         retorna null;
 	 */
 	public static synchronized final ChannelWrapper getMainChannel() {
 		if (canalPrincipal.isConnected()) {
@@ -35,6 +38,8 @@ public class Chat {
 	public static void main(String[] args) {
 		JFrame frame = new JFrame();
 		frame.setTitle("Chat");
+
+		frame.add(Interface.toolbar, BorderLayout.NORTH);
 
 		final JPanel painelDeAbertura = Interface.construirPainelDeAbertura();
 		painelDeAbertura.setVisible(true);
@@ -81,7 +86,10 @@ public class Chat {
 									usuarioConectado, Interface.saida, Interface.usuarios,
 									Interface.tabbedPaneForChats);
 							canalPrincipal.connect(channel, usuarioConectado, recebedorDeMensagens);
+
 							canalPrincipal.sendNovoUsuario(usuarioConectado);
+							
+							Interface.toolbar.add(new JLabel("Logado como: ".concat(usuarioConectado.getNome())));
 						} catch (Exception e) {
 							e.printStackTrace();
 							c1.completeExceptionally(new ErroDeConexao());
@@ -168,7 +176,7 @@ public class Chat {
 
 		frame.getContentPane().add(glassPanel);
 		frame.pack();
-		frame.setSize(1000, 800);
+		frame.setSize(1000, 550);
 		frame.setLocationRelativeTo(null);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) {
