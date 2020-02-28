@@ -48,10 +48,13 @@ public class Usuario implements Serializable {
 	}
 
 	public Address getEnderecoConectado() throws UsuarioNaoConectado {
-		if (enderecoConectado == null) {
-			throw new UsuarioNaoConectado();
+		if (this.enderecoConectado == null) {
+			this.enderecoConectado = Usuarios.getEnderecoConectado(this);
+			if (this.enderecoConectado == null) {
+				throw new UsuarioNaoConectado();
+			}
 		}
-		return enderecoConectado;
+		return this.enderecoConectado;
 	}
 
 	public void setEnderecoConectado(Address enderecoConectado) {

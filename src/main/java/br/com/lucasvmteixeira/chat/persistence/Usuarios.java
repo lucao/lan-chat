@@ -1,6 +1,7 @@
 package br.com.lucasvmteixeira.chat.persistence;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,36 +16,38 @@ import br.com.lucasvmteixeira.chat.entity.GrupoPrivado;
 import br.com.lucasvmteixeira.chat.entity.Usuario;
 
 public class Usuarios {
-	private Map<Address, Usuario> usuariosConectados;
-	private Map<Usuario, Address> enderecosDeUsuarios;
+	private static Map<Address, Usuario> usuariosConectados;
+	private static Map<Usuario, Address> enderecosDeUsuarios;
 	private Set<Address> usuariosConectadosSemIdentificacao;
 
 	private List<Atualizavel> observables;
 
 	public Usuarios() {
 		this.observables = new ArrayList<Atualizavel>();
-		this.usuariosConectados = new HashMap<Address, Usuario>();
-		this.enderecosDeUsuarios = new HashMap<Usuario, Address>();
+		Usuarios.usuariosConectados = Collections.synchronizedMap(new HashMap<Address, Usuario>());
+		Usuarios.enderecosDeUsuarios = Collections.synchronizedMap(new HashMap<Usuario, Address>());
 		this.usuariosConectadosSemIdentificacao = new HashSet<Address>();
 	}
 
 	public void addObserver(Atualizavel o) {
-		this.observables.add(o);
+		if (!this.observables.contains(o)) {
+			this.observables.add(o);
+		}
 	}
 
 	public void putUsuarioConectado(Address sender, Usuario usuarioSender) {
 		usuarioSender.setEnderecoConectado(sender);
 
-		this.usuariosConectados.put(sender, usuarioSender);
-		this.enderecosDeUsuarios.put(usuarioSender, sender);
+		Usuarios.usuariosConectados.put(sender, usuarioSender);
+		Usuarios.enderecosDeUsuarios.put(usuarioSender, sender);
 		this.usuariosConectadosSemIdentificacao.remove(sender);
 		for (Atualizavel o : this.observables) {
-			o.atualizar(this.usuariosConectados.values());
+			o.atualizar(Usuarios.usuariosConectados.values());
 		}
 	}
 
 	public boolean containsUsuario(Address sender) {
-		return this.usuariosConectados.containsKey(sender);
+		return Usuarios.usuariosConectados.containsKey(sender);
 	}
 
 	public boolean containsUsuarioSemIdentificacao(Address sender) {
@@ -57,25 +60,25 @@ public class Usuarios {
 
 	public void removeUsuarios(List<Address> members) {
 		for (Address member : members) {
-			this.enderecosDeUsuarios.remove(this.usuariosConectados.get(member));
-			this.usuariosConectados.remove(member);
+			Usuarios.enderecosDeUsuarios.remove(Usuarios.usuariosConectados.get(member));
+			Usuarios.usuariosConectados.remove(member);
 
 			this.usuariosConectadosSemIdentificacao.remove(member);
 		}
 
 		for (Atualizavel o : this.observables) {
-			o.atualizar(this.usuariosConectados.values());
+			o.atualizar(Usuarios.usuariosConectados.values());
 		}
 	}
 
 	public void updateGrupoDoUsuario(Address member, GrupoPrivado grupo) {
-		Usuario usuario = this.usuariosConectados.get(member);
+		Usuario usuario = Usuarios.usuariosConectados.get(member);
 
 		if (usuario.getGruposPrivados() == null) {
 			usuario.setGruposPrivados(new HashSet<GrupoPrivado>());
 		}
-		Set<Usuario> usuariosDoGrupo = usuariosConectados.values().stream()
-				.filter(u -> this.usuariosConectados.values().contains(u)).collect(Collectors.toSet());
+		Set<Usuario> usuariosDoGrupo = Usuarios.usuariosConectados.values().stream()
+				.filter(u -> Usuarios.usuariosConectados.values().contains(u)).collect(Collectors.toSet());
 		if (usuariosDoGrupo.contains(usuario)) {
 			if (usuario.getGruposPrivados().add(grupo)) {
 				for (Atualizavel o : this.observables) {
@@ -85,7 +88,7 @@ public class Usuarios {
 		}
 	}
 
-	public Address getEnderecoConectado(Usuario usuario) {
-		return enderecosDeUsuarios.get(usuario);
+	public static Address getEnderecoConectado(Usuario usuario) {
+		return Usuarios.enderecosDeUsuarios.get(usuario);
 	}
 }

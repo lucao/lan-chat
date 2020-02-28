@@ -56,7 +56,9 @@ public class Mensagens {
 	}
 
 	public void addObserver(Atualizavel a) {
-		this.observables.add(a);
+		if (!this.observables.contains(a)) {
+			this.observables.add(a);
+		}
 	}
 
 	public List<Mensagem> doGrupo(GrupoPrivado grupo) {
