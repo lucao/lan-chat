@@ -77,9 +77,8 @@ public class Usuarios {
 		if (usuario.getGruposPrivados() == null) {
 			usuario.setGruposPrivados(new HashSet<GrupoPrivado>());
 		}
-		Set<Usuario> usuariosDoGrupo = Usuarios.usuariosConectados.values().stream()
-				.filter(u -> Usuarios.usuariosConectados.values().contains(u)).collect(Collectors.toSet());
-		if (usuariosDoGrupo.contains(usuario)) {
+		
+		if (grupo.getUsuarios().contains(usuario)) {
 			if (usuario.getGruposPrivados().add(grupo)) {
 				for (Atualizavel o : this.observables) {
 					o.atualizar(usuario);

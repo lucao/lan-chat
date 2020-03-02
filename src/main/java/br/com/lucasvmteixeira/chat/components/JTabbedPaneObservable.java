@@ -12,12 +12,15 @@ import java.util.stream.Collectors;
 
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 
 import br.com.lucasvmteixeira.chat.Atualizavel;
 import br.com.lucasvmteixeira.chat.Chat;
@@ -42,12 +45,13 @@ public class JTabbedPaneObservable extends JTabbedPane implements Atualizavel {
 	public final Map<GrupoPrivado, JTextAreaObservable> mapaSaidaPrivado = new HashMap<GrupoPrivado, JTextAreaObservable>();
 	public final Map<GrupoPrivado, JTextField> mapaEntradaPrivado = new HashMap<GrupoPrivado, JTextField>();
 
+	public final Map<GrupoPrivado, JListObservable> mapaListaUsuariosDoGrupo = new HashMap<GrupoPrivado, JListObservable>();
+
 	@Override
 	public synchronized void atualizar(Object o) {
 		try {
 			Mensagem mensagem = (Mensagem) o;
 			mapaSaidaPrivado.get(mensagem.getGrupo()).atualizar(mensagem);
-
 		} catch (ClassCastException e) {
 			try {
 				Usuario usuario = (Usuario) o;
@@ -104,6 +108,28 @@ public class JTabbedPaneObservable extends JTabbedPane implements Atualizavel {
 						JTextField entradaPrivado = new JTextField();
 						mapaEntradaPrivado.put(grupoNaoCriado, entradaPrivado);
 
+						JListObservable listaDeUsuarios = new JListObservable();
+						listaDeUsuarios.atualizar(grupoNaoCriado.getUsuarios());
+						mapaListaUsuariosDoGrupo.put(grupoNaoCriado, listaDeUsuarios);
+
+						JPanel painelDeUsuarios = new JPanel();
+
+						JScrollPane spane = new JScrollPane();
+						spane.getViewport().add(listaDeUsuarios);
+
+						listaDeUsuarios.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+						listaDeUsuarios.setLayoutOrientation(JList.VERTICAL);
+						JLabel label = new JLabel("Lista de usuários do grupo");
+
+						GroupLayout gl = new GroupLayout(painelDeUsuarios);
+						painelDeUsuarios.setLayout(gl);
+						gl.setAutoCreateContainerGaps(true);
+						gl.setAutoCreateGaps(true);
+						gl.setHorizontalGroup(gl.createParallelGroup().addComponent(spane)
+								.addGroup(gl.createSequentialGroup().addComponent(label)));
+						gl.setVerticalGroup(gl.createSequentialGroup().addComponent(spane)
+								.addGroup(gl.createParallelGroup().addComponent(label)));
+
 						GroupLayout layout = new GroupLayout(panel);
 						panel.setLayout(layout);
 						layout.setHorizontalGroup(
@@ -125,12 +151,17 @@ public class JTabbedPaneObservable extends JTabbedPane implements Atualizavel {
 														.addComponent(btnEnviarComplexo,
 																javax.swing.GroupLayout.DEFAULT_SIZE, 50,
 																Short.MAX_VALUE)))
-
+										.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+												.addComponent(painelDeUsuarios, javax.swing.GroupLayout.DEFAULT_SIZE,
+														100, Short.MAX_VALUE))
 										.addContainerGap()));
 						layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 								.addGroup(layout.createSequentialGroup().addContainerGap()
-										.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 350,
-												Short.MAX_VALUE)
+										.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+												.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 350,
+														Short.MAX_VALUE)
+												.addComponent(painelDeUsuarios, javax.swing.GroupLayout.DEFAULT_SIZE,
+														100, Short.MAX_VALUE))
 										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 										.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
 												.addComponent(btnEnviarPrivado, javax.swing.GroupLayout.PREFERRED_SIZE,
@@ -145,6 +176,12 @@ public class JTabbedPaneObservable extends JTabbedPane implements Atualizavel {
 										.addContainerGap()));
 
 						this.add(grupoNaoCriado.getNome(), panel);
+
+						this.setSelectedIndex(this.getTabCount() - 1);
+					}
+
+					for (GrupoPrivado grupoCriado : usuario.getGruposPrivados()) {
+						mapaListaUsuariosDoGrupo.get(grupoCriado).atualizar(grupoCriado.getUsuarios());
 					}
 				}
 
