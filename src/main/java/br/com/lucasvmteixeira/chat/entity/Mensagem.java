@@ -13,7 +13,7 @@ public class Mensagem implements Serializable {
 	private static final long serialVersionUID = -9080246375777754459L;
 	
 	private Date dataDeEnvio;
-	private Address identificadorDoRemetente;
+	private transient Address identificadorDoRemetente;
 	
 	private GrupoPrivado grupo;
 	private String mensagem;

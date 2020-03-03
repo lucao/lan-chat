@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.jgroups.JChannel;
 
 import br.com.lucasvmteixeira.chat.GrupoVazio;
+import br.com.lucasvmteixeira.chat.UsuarioNaoConectado;
 import br.com.lucasvmteixeira.chat.entity.Configuracao;
 import br.com.lucasvmteixeira.chat.entity.GrupoPrivado;
 import br.com.lucasvmteixeira.chat.entity.Mensagem;
@@ -48,7 +49,12 @@ public class ChannelWrapper {
 
 		// TODO controle assíncrono de envio
 		for (Usuario usuario: grupo.getUsuarios()) {
-			this.channel.send(usuario.getEnderecoConectado(), m);
+			try {
+				this.channel.send(usuario.getEnderecoConectado(), m);
+			} catch (UsuarioNaoConectado e) {
+				//TODO
+				continue;
+			}
 		}
 	}
 

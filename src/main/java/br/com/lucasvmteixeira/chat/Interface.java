@@ -144,6 +144,8 @@ public class Interface {
 
 		JLabel label = new JLabel("Digite o seu nome para o chat");
 		btnConectar.setText("Conectar");
+		
+		//TODO criar lista de usuários que já utilizaram o chat local
 
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);

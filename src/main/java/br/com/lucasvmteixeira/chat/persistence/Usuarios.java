@@ -1,5 +1,10 @@
 package br.com.lucasvmteixeira.chat.persistence;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,9 +12,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.jgroups.Address;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import br.com.lucasvmteixeira.chat.Atualizavel;
 import br.com.lucasvmteixeira.chat.entity.GrupoPrivado;
@@ -20,6 +28,8 @@ public class Usuarios {
 	private static Map<Usuario, Address> enderecosDeUsuarios;
 	private Set<Address> usuariosConectadosSemIdentificacao;
 
+	private Set<Usuario> usuariosQueJaUtilizaramOChatNaRedeLocal;
+
 	private List<Atualizavel> observables;
 
 	public Usuarios() {
@@ -27,6 +37,27 @@ public class Usuarios {
 		Usuarios.usuariosConectados = Collections.synchronizedMap(new HashMap<Address, Usuario>());
 		Usuarios.enderecosDeUsuarios = Collections.synchronizedMap(new HashMap<Usuario, Address>());
 		this.usuariosConectadosSemIdentificacao = new HashSet<Address>();
+
+		readFile();
+		// TODO gravar em arquivo usuários que já utilizaram o chat
+	}
+
+	private void readFile() {
+		Path path = Paths.get("users.dat");
+		boolean pathExists = Files.exists(path, new LinkOption[] { LinkOption.NOFOLLOW_LINKS });
+
+		Gson gson = new GsonBuilder().create();
+		try {
+			if (!pathExists) {
+				Files.createFile(path);
+			} else {
+				this.usuariosQueJaUtilizaramOChatNaRedeLocal = gson.fromJson(
+						String.join(System.lineSeparator(), Files.readAllLines(path)), new TypeToken<Set<Usuario>>() {
+						}.getType());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void addObserver(Atualizavel o) {
@@ -77,7 +108,7 @@ public class Usuarios {
 		if (usuario.getGruposPrivados() == null) {
 			usuario.setGruposPrivados(new HashSet<GrupoPrivado>());
 		}
-		
+
 		if (grupo.getUsuarios().contains(usuario)) {
 			if (usuario.getGruposPrivados().add(grupo)) {
 				for (Atualizavel o : this.observables) {

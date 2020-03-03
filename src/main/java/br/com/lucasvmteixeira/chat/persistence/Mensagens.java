@@ -32,7 +32,7 @@ public class Mensagens {
 		this.observables = new ArrayList<Atualizavel>();
 		
 		readFile();
-
+		//TODO gravar arquivos com dados
 	}
 
 	private void readFile() {
