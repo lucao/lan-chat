@@ -30,18 +30,22 @@ public class HandlerDeArquivoDeMensagens implements CompletionHandler<Integer, B
 
 	@Override
 	public void completed(Integer result, ByteBuffer attachment) {
-		attachment.flip();
 
 		int mensagensLidas = 0;
-		int numeroDeBytesLidos = 0;
 		StringBuilder builder = new StringBuilder();
 		if (attachment.hasRemaining()) {
-			do {
-				char lastCharRead = (char) attachment.get();
-				numeroDeBytesLidos++;
-				if (!isEOL(lastCharRead)) {
+			if (attachment.hasArray()) {
+				attachment.flip();
+				String[] stringRead = new String(attachment.array()).split("\\r?\\n");
 
-					final Mensagem mensagem = this.gson.fromJson(builder.toString(), Mensagem.class);
+				// excluindo última mensagem lida caso esteja incompleta
+				for (int i = 0; i < stringRead.length - 1 || mensagensLidas <= 10; i++) {
+					String string = stringRead[i];
+					position += string.getBytes().length;
+
+					final Mensagem mensagem = this.gson.fromJson(string, Mensagem.class);
+					mensagensLidas++;
+
 					if (mensagem != null) {
 						if (mensagem.getDataDeEnvio() != null && mensagem.getMensagem() != null
 								&& mensagem.getSender() != null) {
@@ -54,25 +58,15 @@ public class HandlerDeArquivoDeMensagens implements CompletionHandler<Integer, B
 					} else {
 						System.out.println(builder.toString());
 					}
-
-					position += numeroDeBytesLidos;
-					mensagensLidas++;
-					builder = new StringBuilder();
-				} else {
-					builder.append(lastCharRead);
 				}
-			} while (attachment.hasRemaining() || mensagensLidas < this.offsetDeMensagens);
+			}
 		}
 		attachment.clear();
 	}
 
-	private boolean isEOL(char character) {
-		return ((character == '\n') || (character == '\r')) ? true : false;
-	}
-
 	@Override
 	public void failed(Throwable exc, ByteBuffer attachment) {
-
+		// TODO
 	}
 
 	public long getPosition() {

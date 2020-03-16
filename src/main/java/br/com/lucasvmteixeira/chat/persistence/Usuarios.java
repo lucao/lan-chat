@@ -66,7 +66,14 @@ public class Usuarios {
 		}
 	}
 
-	public void putUsuarioConectado(Address sender, Usuario usuarioSender) {
+	/**
+	 * 
+	 * @param sender
+	 * @param usuarioSender
+	 * @return retorna true se o usuário já esteve conectado na rede e false caso o
+	 *         usuário seja novo
+	 */
+	public boolean putUsuarioConectado(Address sender, Usuario usuarioSender) {
 		usuarioSender.setEnderecoConectado(sender);
 
 		Usuarios.usuariosConectados.put(sender, usuarioSender);
@@ -75,6 +82,9 @@ public class Usuarios {
 		for (Atualizavel o : this.observables) {
 			o.atualizar(Usuarios.usuariosConectados.values());
 		}
+
+		return this.usuariosQueJaUtilizaramOChatNaRedeLocal.add(usuarioSender);
+		// TODO comportamento para usuário que já esteve conectado
 	}
 
 	public boolean containsUsuario(Address sender) {

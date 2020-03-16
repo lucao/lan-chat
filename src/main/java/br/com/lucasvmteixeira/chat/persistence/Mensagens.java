@@ -31,11 +31,16 @@ public class Mensagens {
 		this.mensagens = new HashSet<Mensagem>();
 		this.observables = new ArrayList<Atualizavel>();
 		
-		readFile();
+		try {
+			readFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//TODO gravar arquivos com dados
 	}
 
-	private void readFile() {
+	private String readFile() throws IOException {
 		Path path = Paths.get("data.dat");
 
 		boolean pathExists = Files.exists(path, new LinkOption[] { LinkOption.NOFOLLOW_LINKS });
@@ -50,8 +55,10 @@ public class Mensagens {
 			ByteBuffer buffer = ByteBuffer.allocate(1024);
 			this.handler = new HandlerDeArquivoDeMensagens(this);
 			fileChannel.read(buffer, this.handler.getPosition(), buffer, this.handler);
+			
+			return new String(buffer.array(), "UTF-8");
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw e;
 		}
 	}
 
@@ -87,5 +94,14 @@ public class Mensagens {
 	public Set<Mensagem> enviadasPor(Usuario usuarioConectado) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public void carregarMensagens() {
+		
+	}
+
+	public void carregarMensagensDoUsuario(Usuario sender) {
+		// TODO Auto-generated method stub
+		
 	}
 }
