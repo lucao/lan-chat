@@ -9,10 +9,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import br.com.lucasvmteixeira.chat.Atualizavel;
@@ -26,21 +30,30 @@ public class Mensagens {
 
 	private List<Atualizavel> observables;
 
+	private static final int OFFSET_PARA_LEITURA = 10;
+
+	private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
 	public Mensagens() {
 		super();
-		this.mensagens = new HashSet<Mensagem>();
+		this.mensagens = Collections.synchronizedSet(new HashSet<Mensagem>());
 		this.observables = new ArrayList<Atualizavel>();
+
+		this.handler = new HandlerDeArquivoDeMensagens(this, OFFSET_PARA_LEITURA);
+
+		Runnable readFile = () -> {
+			try {
+				readFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		};
 		
-		try {
-			readFile();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//TODO gravar arquivos com dados
+		executor.scheduleWithFixedDelay(readFile, 0, 1, TimeUnit.SECONDS);
+		// TODO gravar arquivos com dados
 	}
 
-	private String readFile() throws IOException {
+	private synchronized String readFile() throws IOException {
 		Path path = Paths.get("data.dat");
 
 		boolean pathExists = Files.exists(path, new LinkOption[] { LinkOption.NOFOLLOW_LINKS });
@@ -53,9 +66,8 @@ public class Mensagens {
 			}
 
 			ByteBuffer buffer = ByteBuffer.allocate(1024);
-			this.handler = new HandlerDeArquivoDeMensagens(this);
 			fileChannel.read(buffer, this.handler.getPosition(), buffer, this.handler);
-			
+
 			return new String(buffer.array(), "UTF-8");
 		} catch (IOException e) {
 			throw e;
@@ -95,13 +107,8 @@ public class Mensagens {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	public void carregarMensagens() {
-		
-	}
 
-	public void carregarMensagensDoUsuario(Usuario sender) {
-		// TODO Auto-generated method stub
-		
+	public void carregarMensagens() throws IOException {
+		readFile();
 	}
 }

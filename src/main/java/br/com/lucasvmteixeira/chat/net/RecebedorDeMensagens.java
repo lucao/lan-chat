@@ -50,12 +50,11 @@ public class RecebedorDeMensagens extends ReceiverAdapter {
 			synchronized (this.usuarios) {
 				if (this.usuarios.containsUsuarioSemIdentificacao(sender)) {
 					if (!this.usuarios.containsUsuario(sender)) {
-						if (this.usuarios.putUsuarioConectado(sender, mensagem.getSender())) {
-							mensagens.carregarMensagensDoUsuario(mensagem.getSender());
-						}
+						this.usuarios.putUsuarioConectado(sender, mensagem.getSender());
 					}
 				}
 			}
+			
 			synchronized (mensagens) {
 				mensagens.add(mensagem);
 				mensagens.ler(mensagem, mensagem.getSender());

@@ -2,6 +2,7 @@ package br.com.lucasvmteixeira.chat.persistence;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
+import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -13,6 +14,8 @@ public class HandlerDeArquivoDeMensagens implements CompletionHandler<Integer, B
 	private Mensagens mensagens;
 	private Gson gson;
 	private final int offsetDeMensagens;
+	
+	private static final Pattern pattern = Pattern.compile("\\r?\\n");
 
 	public HandlerDeArquivoDeMensagens(Mensagens mensagens, int offsetDeMensagens) {
 		this.position = 0;
@@ -20,14 +23,6 @@ public class HandlerDeArquivoDeMensagens implements CompletionHandler<Integer, B
 		this.gson = new GsonBuilder().create();
 		this.offsetDeMensagens = offsetDeMensagens;
 	}
-
-	public HandlerDeArquivoDeMensagens(Mensagens mensagens) {
-		this.position = 0;
-		this.mensagens = mensagens;
-		this.gson = new GsonBuilder().create();
-		this.offsetDeMensagens = 10;
-	}
-
 	@Override
 	public void completed(Integer result, ByteBuffer attachment) {
 
@@ -36,10 +31,10 @@ public class HandlerDeArquivoDeMensagens implements CompletionHandler<Integer, B
 		if (attachment.hasRemaining()) {
 			if (attachment.hasArray()) {
 				attachment.flip();
-				String[] stringRead = new String(attachment.array()).split("\\r?\\n");
+				String[] stringRead = HandlerDeArquivoDeMensagens.pattern.split(new String(attachment.array()));
 
 				// excluindo última mensagem lida caso esteja incompleta
-				for (int i = 0; i < stringRead.length - 1 || mensagensLidas <= 10; i++) {
+				for (int i = 0; i < stringRead.length - 1 || mensagensLidas <= this.offsetDeMensagens; i++) {
 					String string = stringRead[i];
 					position += string.getBytes().length;
 
